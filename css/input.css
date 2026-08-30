@@ -3,4 +3,12 @@
 @theme {
     --color-teal-700: #1a8d8d;
     --color-orange-500: #e57c00;
+
+    --color-brand-teal: #1a8d8d;
+    --color-brand-orange: #f3821a;
+
+    --color-surface: #f9f9ff;
+    --color-surface-container: #ffffff;
+
+    --font-sans: "Plus Jakarta Sans", sans-serif;
 }

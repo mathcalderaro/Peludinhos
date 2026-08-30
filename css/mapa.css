@@ -1,0 +1,22 @@
+body {
+    background-color: #f9f9ff;
+    -webkit-font-smoothing: antialiased;
+}
+
+#map {
+    height: 100%;
+    width: 100%;
+    z-index: 10;
+}
+
+.custom-marker {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.custom-marker-icon {
+    color: #f3821a;
+    font-size: 36px;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+}
