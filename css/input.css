@@ -12,3 +12,14 @@
 
     --font-sans: "Plus Jakarta Sans", sans-serif;
 }
+
+.mask-patinhas {
+    mask-image: url('../assets/icons/patinhas.svg');
+    -webkit-mask-image: url('../assets/icons/patinhas.svg');
+    mask-size: contain;
+    -webkit-mask-size: contain;
+    mask-repeat: no-repeat;
+    -webkit-mask-repeat: no-repeat;
+    mask-position: center;
+    -webkit-mask-position: center;
+}

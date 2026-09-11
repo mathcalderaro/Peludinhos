@@ -27,4 +27,7 @@ loginForm.addEventListener("submit", function (event) {
 
   console.log("E-mail:", email);
   console.log("Senha:", password);
+  
+  // Redireciona para a página de animais (ou mapa)
+  window.location.href = "pages/animais.html";
 });
