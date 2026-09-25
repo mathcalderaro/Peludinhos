@@ -50,6 +50,10 @@
         rel="stylesheet"
     >
 
+    <!-- Página protegida: sem token (ou token vencido) → volta para o login -->
+    <script src="../js/auth.js"></script>
+    <script>exigirLogin();</script>
+
 </head>
 
 <body
@@ -79,12 +83,25 @@
 
             </div>
 
-            <button
-                aria-label="Notificações"
-                class="text-2xl p-1 relative"
-            >
-                <i class="ri-notification-3-line"></i>
-            </button>
+            <div class="flex items-center gap-1">
+
+                <button
+                    aria-label="Notificações"
+                    class="text-2xl p-1 relative"
+                >
+                    <i class="ri-notification-3-line"></i>
+                </button>
+
+                <a
+                    href="perfil.html"
+                    aria-label="Meu perfil"
+                    title="Meu perfil"
+                    class="text-2xl p-1"
+                >
+                    <i class="ri-user-3-line"></i>
+                </a>
+
+            </div>
 
         </div>
 

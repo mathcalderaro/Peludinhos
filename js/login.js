@@ -14,7 +14,7 @@ togglePassword.addEventListener("click", function () { // essa linha diz que, qu
   }
 });
 
-loginForm.addEventListener("submit", function (event) {
+loginForm.addEventListener("submit", async function (event) {
   event.preventDefault();
 
   const email = document.getElementById("email").value.trim();
@@ -25,6 +25,34 @@ loginForm.addEventListener("submit", function (event) {
     return;
   }
 
-  console.log("E-mail:", email);
-  console.log("Senha:", password);
+  try {
+    const resposta = await fetch("http://localhost:3000/api/login", {
+      method: "POST",
+
+      headers: {
+        "Content-Type": "application/json"
+      },
+
+      body: JSON.stringify({
+        email: email,
+        senha: password
+      })
+    });
+
+    const dados = await resposta.json();
+
+    if (!resposta.ok) {
+      alert(dados.erro || "Não foi possível realizar o login.");
+      return;
+    }
+
+    localStorage.setItem("token", dados.token);
+
+    window.location.href = "pages/mapa.html";
+
+  } catch (erro) {
+    console.error("Erro ao conectar com o servidor:", erro);
+
+    alert("Não foi possível conectar ao servidor.");
+  }
 });
