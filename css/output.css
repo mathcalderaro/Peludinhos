@@ -23,7 +23,6 @@
     --color-gray-50: oklch(98.5% 0.002 247.839);
     --color-gray-100: oklch(96.7% 0.003 264.542);
     --color-gray-200: oklch(92.8% 0.006 264.531);
-    --color-gray-300: oklch(87.2% 0.01 258.338);
     --color-gray-400: oklch(70.7% 0.022 261.325);
     --color-gray-500: oklch(55.1% 0.027 264.364);
     --color-gray-600: oklch(44.6% 0.03 256.802);
@@ -254,9 +253,6 @@
   .right-4 {
     right: calc(var(--spacing) * 4);
   }
-  .right-6 {
-    right: calc(var(--spacing) * 6);
-  }
   .right-8 {
     right: calc(var(--spacing) * 8);
   }
@@ -275,8 +271,8 @@
   .bottom-10 {
     bottom: calc(var(--spacing) * 10);
   }
-  .bottom-24 {
-    bottom: calc(var(--spacing) * 24);
+  .bottom-28 {
+    bottom: calc(var(--spacing) * 28);
   }
   .bottom-\[275px\] {
     bottom: 275px;
@@ -301,6 +297,9 @@
   }
   .z-30 {
     z-index: 30;
+  }
+  .z-40 {
+    z-index: 40;
   }
   .mx-auto {
     margin-inline: auto;
@@ -653,9 +652,6 @@
   }
   .bg-gray-200 {
     background-color: var(--color-gray-200);
-  }
-  .bg-gray-300 {
-    background-color: var(--color-gray-300);
   }
   .bg-gray-400 {
     background-color: var(--color-gray-400);
