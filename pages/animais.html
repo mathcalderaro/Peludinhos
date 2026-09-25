@@ -10,8 +10,8 @@
     <link rel="stylesheet" href="../css/output.css">
     <link href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" rel="stylesheet">
 </head>
-<body class="w-full max-w-sm mx-auto flex flex-col items-center">
-  <div class="">
+<body class="min-h-screen flex flex-col bg-gray-100 text-gray-800">
+  <div class="w-full sm:max-w-sm mx-auto min-h-screen flex flex-col font-sans bg-surface relative sm:shadow-2xl">
     <header class="bg-brand-teal text-white z-20 relative pt-2 pb-6 px-4 rounded-b-[2rem] shadow-md flex flex-col gap-4">
         <div class="flex items-center justify-between">
 
@@ -44,9 +44,9 @@
 
         <div class="flex flex-col gap-4 mt-2">
             <!-- Animal Card -->
-            <a href="detalhes_animal.html" class="bg-white rounded-2xl p-3 shadow-sm flex items-center gap-4">
+            <a href="detalhes_animal.html" class="bg-white rounded-2xl p-3 shadow-sm flex items-center gap-4 relative overflow-hidden">
                 <img src="../assets/images/rex.jpg" alt="Rex" class="w-20 h-20 rounded-xl object-cover" onerror="this.src='https://images.unsplash.com/photo-1543466835-00a7907e9de1?ixlib=rb-4.0.3&auto=format&fit=crop&w=150&q=80'">
-                <div class="flex-1">
+                <div class="flex-1 relative z-10">
                     <div class="flex justify-between items-start">
                         <div>
                             <h2 class="text-lg font-bold text-gray-800">Rex</h2>
@@ -59,15 +59,15 @@
                         <span class="px-3 py-1 rounded-full border border-teal-600 text-teal-700 text-xs font-medium">Chipado</span>
                     </div>
                 </div>
-                <div class="text-brand-orange opacity-20 absolute right-4 bottom-4 pointer-events-none">
+                <div class="text-brand-orange opacity-20 absolute right-4 bottom-4 pointer-events-none z-0">
                     <i class="ri-bear-smile-fill text-4xl"></i>
                 </div>
             </a>
             
             <!-- Animal Card -->
-            <a href="detalhes_animal.html" class="bg-white rounded-2xl p-3 shadow-sm flex items-center gap-4">
+            <a href="detalhes_animal.html" class="bg-white rounded-2xl p-3 shadow-sm flex items-center gap-4 relative overflow-hidden">
                 <img src="../assets/images/mel.jpg" alt="Mel" class="w-20 h-20 rounded-xl object-cover" onerror="this.src='https://images.unsplash.com/photo-1583337130417-3346a1be7dee?ixlib=rb-4.0.3&auto=format&fit=crop&w=150&q=80'">
-                <div class="flex-1">
+                <div class="flex-1 relative z-10">
                     <div class="flex justify-between items-start">
                         <div>
                             <h2 class="text-lg font-bold text-gray-800">Mel</h2>
@@ -79,7 +79,7 @@
                         <span class="px-3 py-1 rounded-full border border-orange-400 text-orange-500 text-xs font-medium">Não castrado</span>
                     </div>
                 </div>
-                <div class="text-brand-orange opacity-20 absolute right-4 bottom-4 pointer-events-none">
+                <div class="text-brand-orange opacity-20 absolute right-4 bottom-4 pointer-events-none z-0">
                     <i class="ri-bear-smile-fill text-4xl"></i>
                 </div>
             </a>
@@ -127,14 +127,14 @@
         </div>
     </main>
 
-    <!-- Floating Action Button placeholder (like in the first image) -->
-    <div class="fixed bottom-24 left-0 right-0 mx-auto w-full max-w-sm pointer-events-none z-20">
+    <!-- Floating Action Button placeholder -->
+    <div class="fixed bottom-24 left-0 right-0 mx-auto w-full sm:max-w-sm pointer-events-none z-20">
         <a href="novo_avistamento.html" class="absolute right-6 w-14 h-14 bg-gray-300 rounded-full shadow-lg flex items-center justify-center pointer-events-auto">
             <i class="ri-add-line text-2xl text-gray-600"></i>
         </a>
     </div>
 
-    <nav class="fixed bottom-0 left-0 right-0 mx-auto w-full max-w-sm bg-white border-t border-gray-100 flex justify-around items-center py-2 px-4 pb-safe z-30 shadow-[0_-4px_10px_rgba(0,0,0,0.05)]">
+    <nav class="fixed bottom-0 left-0 right-0 mx-auto w-full sm:max-w-sm bg-white border-t border-gray-100 flex justify-around items-center py-2 px-4 pb-safe z-30 shadow-[0_-4px_10px_rgba(0,0,0,0.05)]">
         <a href="animais.html" class="flex flex-col items-center p-2 text-brand-orange">
             <div class="mask-patinhas w-6 h-6 mb-1 bg-brand-orange"></div>
             <span class="text-[10px] font-medium">Animais</span>

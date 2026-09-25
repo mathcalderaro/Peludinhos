@@ -11,26 +11,57 @@
     <link href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" rel="stylesheet">
 </head>
 <body class="min-h-screen flex flex-col bg-gray-100 text-gray-800">
-  <div class="w-full max-w-sm mx-auto min-h-screen flex flex-col font-sans bg-surface relative shadow-2xl">
-    <header class="bg-brand-teal text-white z-20 relative pt-12 pb-6 px-4 rounded-b-[2rem] shadow-md flex flex-col gap-4">
+  <div class="w-full sm:max-w-sm mx-auto min-h-screen flex flex-col font-sans bg-surface relative sm:shadow-2xl">
+    <header class="bg-brand-teal text-white z-20 relative pt-2 pb-4 px-4 rounded-b-3xl shadow-md flex flex-col gap-4">
+
         <div class="flex items-center justify-between">
-            <button aria-label="Menu" class="text-2xl p-1">
+
+            <button
+                aria-label="Menu"
+                class="text-2xl p-1"
+            >
                 <i class="ri-menu-line"></i>
             </button>
-            <div class="flex items-center gap-2 absolute left-1/2 -translate-x-1/2">
+
+            <div class="flex items-center gap-2">
                 <img src="../assets/icons/peludinhos.svg" alt="Logo" class="h-6 w-auto brightness-0 invert">
                 <h1 class="text-xl font-bold tracking-tight">Peludinhos</h1>
             </div>
-            <button aria-label="Notificações" class="text-2xl p-1 relative">
+
+            <button
+                aria-label="Notificações"
+                class="text-2xl p-1 relative"
+            >
                 <i class="ri-notification-3-line"></i>
             </button>
+
         </div>
+
         <div class="flex items-center gap-3">
+
             <div class="relative flex-1">
-                <input class="w-full pl-4 pr-10 py-3 rounded-xl text-gray-800 placeholder-gray-400 focus:outline-none border-none shadow-sm text-sm" placeholder="Buscar por bairro, raça ou nome" type="text">
-                <i class="ri-search-line absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 text-lg"></i>
+
+                <input
+                    class="w-full pl-4 pr-10 py-3 rounded-xl bg-white text-gray-800 placeholder-gray-400 focus:outline-none border-none shadow-sm text-sm"
+                    placeholder="Buscar animais ou locais"
+                    type="text"
+                >
+
+                <i
+                    class="ri-search-line absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 text-lg"
+                ></i>
+
             </div>
+
+            <button
+                aria-label="Filtrar"
+                class="bg-white p-3 rounded-xl text-gray-600 shadow-sm"
+            >
+                <i class="ri-list-settings-line text-lg"></i>
+            </button>
+
         </div>
+
     </header>
 
     <main class="flex-1 overflow-y-auto z-10 px-4 pt-6 pb-24">
@@ -74,7 +105,7 @@
     </main>
 
     <!-- Floating Action Button: Botão de Divulgação -->
-    <div class="fixed bottom-24 left-0 right-0 mx-auto w-full max-w-sm pointer-events-none z-20">
+    <div class="fixed bottom-24 left-0 right-0 mx-auto w-full sm:max-w-sm pointer-events-none z-20">
         <a href="#" class="absolute right-6 bg-red-500 text-white px-5 py-3 rounded-full shadow-lg flex items-center justify-center gap-2 hover:bg-red-600 transition-colors pointer-events-auto">
             <i class="ri-megaphone-fill text-xl"></i>
             <span class="font-bold text-sm">Divulgar Fuga</span>
@@ -82,7 +113,7 @@
     </div>
 
     <!-- Bottom Navigation -->
-    <nav class="fixed bottom-0 left-0 right-0 mx-auto w-full max-w-sm bg-white border-t border-gray-100 flex justify-around items-center py-2 px-4 pb-safe z-30 shadow-[0_-4px_10px_rgba(0,0,0,0.05)]">
+    <nav class="fixed bottom-0 left-0 right-0 mx-auto w-full sm:max-w-sm bg-white border-t border-gray-100 flex justify-around items-center py-2 px-4 pb-safe z-30 shadow-[0_-4px_10px_rgba(0,0,0,0.05)]">
         <a href="animais.html" class="flex flex-col items-center p-2 text-gray-400 hover:text-gray-600 transition-colors">
             <div class="mask-patinhas w-6 h-6 mb-1 bg-gray-400"></div>
             <span class="text-[10px] font-medium">Animais</span>
