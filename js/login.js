@@ -26,7 +26,7 @@ loginForm.addEventListener("submit", async function (event) {
   }
 
   try {
-    const resposta = await fetch("http://localhost:3000/api/login", {
+    const resposta = await fetch("/api/login", {
       method: "POST",
 
       headers: {

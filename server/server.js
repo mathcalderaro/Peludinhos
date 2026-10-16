@@ -21,6 +21,13 @@ app.use("/uploads", express.static(path.join(__dirname, "uploads"), {
 }));
 app.use("/api", authRoutes);
 
+// Serve somente os arquivos públicos do frontend.
+for (const pasta of ["assets", "css", "js", "pages"]) {
+    app.use("/" + pasta, express.static(path.join(__dirname, "..", pasta)));
+}
+app.get("/", (req, res) => res.sendFile(path.join(__dirname, "..", "index.html")));
+app.get("/login.html", (req, res) => res.sendFile(path.join(__dirname, "..", "login.html")));
+
 app.get("/api", (req, res) => {
     res.json({
         mensagem: "API do Peludinhos funcionando!"

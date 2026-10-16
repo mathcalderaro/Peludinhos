@@ -167,7 +167,7 @@ cadastroForm.addEventListener("submit", async function (event) {
   }
 
 try {
-    const resposta = await fetch("http://localhost:3000/api/usuarios", {
+    const resposta = await fetch("/api/usuarios", {
         method: "POST",
         headers: {
             "Content-Type": "application/json"

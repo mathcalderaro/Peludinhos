@@ -6,7 +6,7 @@
 // IMPORTANTE: isto só melhora a experiência (redireciona quem não está logado).
 // A segurança de verdade está no backend (middleware autenticarToken).
 
-const API_URL = "http://localhost:3000/api";
+const API_URL = "/api";
 const LOGIN_URL = "../login.html";
 
 

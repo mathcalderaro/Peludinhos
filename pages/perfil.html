@@ -15,10 +15,11 @@
 <!-- Sem token (ou token vencido) → volta para o login antes de desenhar a página -->
 <script src="../js/auth.js"></script>
 <script>exigirLogin();</script>
+<link href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" rel="stylesheet">
 </head>
 <body class="min-h-screen flex flex-col items-center p-6 text-gray-800">
 <!-- BEGIN: MainContent -->
-<main class="w-full max-w-sm mx-auto flex flex-col items-center">
+<main style="padding-bottom: 100px" class="w-full max-w-sm mx-auto flex flex-col items-center">
 <!-- BEGIN: TopBar -->
 <nav class="w-full flex items-center justify-between mb-6">
     <a
@@ -283,4 +284,22 @@
 </main>
 <!-- END: MainContent -->
 <script src="../js/perfil.js"></script>
+<nav class="fixed bottom-0 left-0 right-0 mx-auto w-full sm:max-w-sm bg-white border-t border-gray-100 flex justify-around items-center py-2 px-4 pb-safe z-30 shadow-[0_-4px_10px_rgba(0,0,0,0.05)]">
+        <a href="animais.html" class="flex flex-col items-center p-2 text-gray-400 hover:text-gray-600 transition-colors">
+            <div class="mask-patinhas w-6 h-6 mb-1 bg-gray-400"></div>
+            <span class="text-[10px] font-medium">Animais</span>
+        </a>
+        <a href="mapa.html" class="flex flex-col items-center p-2 text-gray-400">
+            <i class="ri-map-pin-2-fill text-2xl"></i>
+            <span class="text-[10px] font-medium mt-1">Mapa</span>
+        </a>
+        <a href="perdidos.html" class="flex flex-col items-center p-2 text-gray-400 hover:text-gray-600 transition-colors">
+            <i class="ri-megaphone-fill text-2xl"></i>
+            <span class="text-[10px] font-medium mt-1">Perdidos</span>
+        </a>
+        <a href="perfil.html" class="flex flex-col items-center p-2 text-brand-orange">
+            <i class="ri-user-fill text-2xl"></i>
+            <span class="text-[10px] font-medium mt-1">Perfil</span>
+        </a>
+    </nav>
 </body></html>
