@@ -21,20 +21,13 @@ app.use("/uploads", express.static(path.join(__dirname, "uploads"), {
 }));
 app.use("/api", authRoutes);
 
-// Serve somente os arquivos públicos do frontend.
-for (const pasta of ["assets", "css", "js", "pages"]) {
-    app.use("/" + pasta, express.static(path.join(__dirname, "..", pasta)));
-}
-app.get("/", (req, res) => res.sendFile(path.join(__dirname, "..", "index.html")));
-app.get("/login.html", (req, res) => res.sendFile(path.join(__dirname, "..", "login.html")));
-
 app.get("/api", (req, res) => {
     res.json({
         mensagem: "API do Peludinhos funcionando!"
     });
 });
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3001;
 
 app.get("/api/teste-banco", async (req, res) => {
     try {
@@ -51,6 +44,16 @@ app.get("/api/teste-banco", async (req, res) => {
             erro: "Erro ao conectar com PostgreSQL."
         });
     }
+});
+
+app.use('/api', (req, res) => res.status(404).json({ erro: 'Rota da API não encontrada.' }));
+app.use(express.static(path.join(__dirname, '..', 'dist')));
+// React Router resolve as páginas, inclusive ao atualizar uma URL interna.
+app.get('/{*path}', (req, res) => {
+    if (path.extname(req.path) && !req.path.endsWith('.html')) {
+        return res.status(404).send('Arquivo não encontrado.');
+    }
+    res.sendFile(path.join(__dirname, '..', 'dist', 'index.html'));
 });
 
 app.listen(PORT, () => {
