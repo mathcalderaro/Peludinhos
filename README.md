@@ -48,4 +48,20 @@ Para gerar os arquivos finais: `npm run build`. Para servir a versão compilada:
 
 Os HTMLs, CSS e scripts antigos foram mantidos na pasta `legacy` apenas como referência visual. Eles não são servidos pela aplicação. O único HTML de entrada é `index.html`, que carrega o React; não o abra diretamente no navegador.
 
-Cadastro, login, edição do perfil, alteração de senha e foto de perfil usam a API. Animais, perdidos e avistamentos continuam sendo telas de demonstração, sem persistência implementada; a migração de framework não adiciona endpoints para essas funcionalidades. A foto pode ser enviada pelo perfil depois do cadastro.
+Cadastro, login, edição do perfil, alteração de senha e foto de perfil usam a API. A foto de perfil pode ser enviada depois do cadastro. A tela de perdidos ainda é demonstrativa.
+
+## Registrar e consultar avistamentos
+
+O formulário **Novo avistamento** tem quatro etapas: **Foto → Informações → Saúde → Localização**. Aceita uma foto JPG, PNG ou WEBP de até 5 MB (opcional). O local é escolhido tocando no mapa, arrastando o ponto, informando coordenadas ou usando a localização do navegador com a permissão do usuário.
+
+Ao publicar, a API cria o animal e o avistamento em uma única transação nas tabelas existentes. Não é necessário recriar o banco ou executar novamente o SQL. O autor vem do token de login; as coordenadas e os campos são validados no servidor. A foto fica em `server/uploads` e seu caminho é salvo no banco. Se a gravação falhar, a API desfaz a transação e remove a foto enviada.
+
+O registro aparece no mapa Leaflet/OpenStreetMap, nos avistamentos recentes e na lista de animais avistados. O cartão e o marcador abrem os detalhes daquele avistamento, incluindo sua saúde. Ao publicar, o ponto novo é destacado. A lista busca até 200 avistamentos mais recentes; é atualizada ao entrar na tela, voltar à aba ou acionar **Atualizar**. As duas telas usam os mesmos dados da API e não têm pontos de exemplo fixos.
+
+Rotas autenticadas:
+
+- `POST /api/avistamentos`: formulário multipart com `especie`, `latitude`, `longitude` e, opcionalmente, `nome`, `raca`, `cor`, `genero`, `estado_saude`, `observacao` e o arquivo `foto`.
+- `GET /api/avistamentos`: listagem por data decrescente; `?limit=1..500` limita os resultados (padrão 200).
+- `GET /api/avistamentos/:id`: dados de um avistamento específico.
+
+Para testar com o PostgreSQL configurado no `.env`: `npm run test:avistamentos`. O teste inicia um servidor em uma porta temporária e cria e remove somente seus próprios dados de teste. Verifica autenticação, validação, upload, persistência, detalhes, ordenação e conta desativada.

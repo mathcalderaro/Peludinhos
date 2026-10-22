@@ -3,7 +3,7 @@ export async function api(path, options = {}) {
   const response = await fetch(`/api${path}`, {
     ...options,
     headers: {
-      ...(options.body && !(options.body instanceof Blob) ? { 'Content-Type': 'application/json' } : {}),
+      ...(options.body && !(options.body instanceof Blob) && !(options.body instanceof FormData) ? { 'Content-Type': 'application/json' } : {}),
       ...(token ? { Authorization: `Bearer ${token}` } : {}),
       ...options.headers,
     },

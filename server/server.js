@@ -12,6 +12,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 app.use("/api/usuarios", usuarioRoutes);
+app.use('/api/avistamentos', require('./routes/avistamentoRoutes'));
 
 // fotos de perfil enviadas pelos usuários (ex.: http://localhost:3000/uploads/usuario-1-123.jpg)
 app.use("/uploads", express.static(path.join(__dirname, "uploads"), {

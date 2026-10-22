@@ -27,6 +27,7 @@ export default function App() {
       <Route path="/mapa" element={<MapPage />} /><Route path="/animais" element={<Animals />} />
       <Route path="/perdidos" element={<Lost />} /><Route path="/perfil" element={<Profile />} />
       <Route path="/detalhes-animal" element={<AnimalDetails />} /><Route path="/novo-avistamento" element={<NewSighting />} />
+      <Route path="/avistamentos/:id" element={<AnimalDetails />} />
     </Route>
     {Object.entries(aliases).map(([from, to]) => <Route key={from} path={from} element={<Navigate to={to} replace />} />)}
     <Route path="*" element={<main className="p-8 text-center"><h1>Página não encontrada</h1><button className="text-teal-700 mt-4" onClick={() => navigate('/')}>Voltar ao início</button></main>} />
