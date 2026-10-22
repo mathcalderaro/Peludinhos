@@ -71,8 +71,9 @@
 .no-scrollbar { scrollbar-width: none; }
 #root { min-height: 100vh; }
 
-.live-map-pin { width: 44px; height: 44px; padding: 3px; background: white; border: 2px solid #1a8d8d; border-radius: 50%; box-shadow: 0 3px 10px #0003; }
-.live-map-pin img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; }
+.live-map-pin { position: relative; width: 56px; height: 84px; filter: drop-shadow(0 2px 1px #fff) drop-shadow(0 3px 4px #0004); }
+.leaflet-container .live-map-pin img.live-map-pin-logo { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; }
+.leaflet-container .live-map-pin img.live-map-pin-photo { position: absolute; left: 22%; top: 26%; width: 56%; height: 37.3333%; object-fit: cover; border: 2px solid white; border-radius: 50%; background: white; }
 .live-map-popup { width: 180px; font-family: 'Plus Jakarta Sans', sans-serif; }
 .live-map-popup > img { width: 100%; height: 95px; object-fit: cover; border-radius: 10px; margin-bottom: 8px; }
 .live-map-popup strong { display: block; font-size: 16px; overflow-wrap: anywhere; }

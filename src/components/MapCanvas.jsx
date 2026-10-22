@@ -31,10 +31,18 @@ export default function MapCanvas({ sightings = [], selectedId }) {
       points.push(point);
       const markerElement = document.createElement('div');
       markerElement.className = 'live-map-pin';
-      const photo = document.createElement('img');
-      photo.src = item.foto || '/assets/icons/peludinhos.svg'; photo.alt = '';
-      markerElement.append(photo);
-      const icon = L.divIcon({ html: markerElement, className: '', iconSize: [44, 44], iconAnchor: [22, 44] });
+      const logo = document.createElement('img');
+      logo.className = 'live-map-pin-logo';
+      logo.src = '/assets/icons/peludinhos.svg'; logo.alt = '';
+      markerElement.append(logo);
+      if (item.foto) {
+        const photo = document.createElement('img');
+        photo.className = 'live-map-pin-photo';
+        photo.src = item.foto; photo.alt = '';
+        photo.addEventListener('error', () => photo.remove(), { once: true });
+        markerElement.append(photo);
+      }
+      const icon = L.divIcon({ html: markerElement, className: '', iconSize: [56, 84], iconAnchor: [28, 84], popupAnchor: [0, -76] });
       const content = document.createElement('div');
       content.className = 'live-map-popup';
       if (item.foto) { const img = document.createElement('img'); img.src = item.foto; img.alt = sightingName(item); content.append(img); }
