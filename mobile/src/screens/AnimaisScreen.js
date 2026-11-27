@@ -14,9 +14,15 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons, FontAwesome5 } from '@expo/vector-icons';
 import { COLORS } from '../theme/colors';
 import { MainHeader } from '../components/Header';
+import { PataFilterIcon, DogFilterIcon, CatFilterIcon } from '../components/Icons';
 import { usePets } from '../context/PetsContext';
 
-const CATEGORIAS = ['Todos', 'Cachorros', 'Gatos', 'Chipados'];
+const CATEGORIAS = [
+  { key: 'Todos', label: 'Todos' },
+  { key: 'Cachorros', label: 'Cachorros' },
+  { key: 'Gatos', label: 'Gatos' },
+  { key: 'Chipados', label: 'Chipados' },
+];
 
 export default function AnimaisScreen({ navigation }) {
   const { animais, removerAnimal } = usePets();
@@ -124,8 +130,9 @@ export default function AnimaisScreen({ navigation }) {
         onSearchChange={setBusca}
         showMenuButton={false}
         onFilterPress={() => {
-          const proxIndex = (CATEGORIAS.indexOf(categoriaAtiva) + 1) % CATEGORIAS.length;
-          setCategoriaAtiva(CATEGORIAS[proxIndex]);
+          const idxAtual = CATEGORIAS.findIndex((c) => c.key === categoriaAtiva);
+          const proxIndex = (idxAtual + 1) % CATEGORIAS.length;
+          setCategoriaAtiva(CATEGORIAS[proxIndex].key);
         }}
       />
 
@@ -134,18 +141,42 @@ export default function AnimaisScreen({ navigation }) {
           <ScrollView
             horizontal
             showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.pillsContainer}
+            contentContainerStyle={styles.filterCirclesContainer}
           >
             {CATEGORIAS.map((cat) => {
-              const ativo = categoriaAtiva === cat;
+              const ativo = categoriaAtiva === cat.key;
+              const iconColor = ativo ? COLORS.white : COLORS.brandTeal;
+
               return (
                 <TouchableOpacity
-                  key={cat}
-                  style={[styles.pill, ativo ? styles.pillActive : styles.pillInactive]}
-                  onPress={() => setCategoriaAtiva(cat)}
+                  key={cat.key}
+                  style={styles.filterCircleItem}
+                  activeOpacity={0.8}
+                  onPress={() => setCategoriaAtiva(cat.key)}
                 >
-                  <Text style={[styles.pillText, ativo ? styles.pillTextActive : styles.pillTextInactive]}>
-                    {cat}
+                  <View
+                    style={[
+                      styles.filterCircle,
+                      ativo ? styles.filterCircleActive : styles.filterCircleInactive,
+                    ]}
+                  >
+                    {cat.key === 'Todos' ? (
+                      <PataFilterIcon size={24} color={iconColor} />
+                    ) : cat.key === 'Cachorros' ? (
+                      <DogFilterIcon size={28} color={iconColor} />
+                    ) : cat.key === 'Gatos' ? (
+                      <CatFilterIcon size={26} color={iconColor} />
+                    ) : (
+                      <Ionicons name="shield-checkmark" size={22} color={iconColor} />
+                    )}
+                  </View>
+                  <Text
+                    style={[
+                      styles.filterCircleLabel,
+                      ativo ? styles.filterCircleLabelActive : styles.filterCircleLabelInactive,
+                    ]}
+                  >
+                    {cat.label}
                   </Text>
                 </TouchableOpacity>
               );
@@ -242,37 +273,52 @@ const styles = StyleSheet.create({
   content: {
     flex: 1,
   },
-  pillsContainer: {
-    paddingHorizontal: 16,
-    paddingTop: 18,
-    paddingBottom: 12,
-    gap: 8,
-  },
-  pill: {
+  filterCirclesContainer: {
     paddingHorizontal: 18,
-    paddingVertical: 8,
-    borderRadius: 999,
+    paddingTop: 18,
+    paddingBottom: 14,
+    gap: 22,
+    alignItems: 'center',
   },
-  pillActive: {
+  filterCircleItem: {
+    alignItems: 'center',
+    gap: 6,
+  },
+  filterCircle: {
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  filterCircleActive: {
     backgroundColor: COLORS.brandTeal,
+    elevation: 4,
+    shadowColor: COLORS.brandTeal,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
   },
-  pillInactive: {
+  filterCircleInactive: {
     backgroundColor: COLORS.white,
-    elevation: 1,
+    borderWidth: 1,
+    borderColor: COLORS.gray100,
+    elevation: 2,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 2,
+    shadowOpacity: 0.06,
+    shadowRadius: 3,
   },
-  pillText: {
-    fontSize: 13,
+  filterCircleLabel: {
+    fontSize: 12,
     fontWeight: '600',
   },
-  pillTextActive: {
-    color: COLORS.white,
+  filterCircleLabelActive: {
+    color: COLORS.brandTeal,
+    fontWeight: '700',
   },
-  pillTextInactive: {
-    color: COLORS.gray600,
+  filterCircleLabelInactive: {
+    color: COLORS.brandTeal,
   },
   listContent: {
     paddingHorizontal: 16,

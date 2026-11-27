@@ -35,8 +35,8 @@ const DOG_SVG_HTML = `
     svg {
       width: 100%;
       height: 100%;
-      max-width: 240px;
-      max-height: 196px;
+      max-width: 170px;
+      max-height: 140px;
     }
   </style>
 </head>
@@ -231,14 +231,14 @@ function PataIcon({ size = 34, opacity = 0.22 }) {
   );
 }
 
-export function DogLoadingContent({ message = '' }) {
+export function DogLoadingContent({ message = 'Carregando...' }) {
   const anim = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
     const loop = Animated.loop(
       Animated.timing(anim, {
         toValue: 1,
-        duration: 7000,
+        duration: 9000,
         easing: Easing.linear,
         useNativeDriver: true,
       })
@@ -280,10 +280,10 @@ export function DogLoadingContent({ message = '' }) {
                 key={c}
                 style={[
                   styles.patternCell,
-                  { transform: [{ rotate: '-18deg' }, { translateY: c % 2 === 0 ? 0 : 28 }] },
+                  { transform: [{ rotate: '-20deg' }, { translateY: c % 2 === 0 ? 0 : 28 }] },
                 ]}
               >
-                <PataIcon size={38} opacity={0.16} />
+                <PataIcon size={40} opacity={0.18} />
               </View>
             ))}
           </View>
@@ -297,8 +297,8 @@ export function DogLoadingContent({ message = '' }) {
               title="Dog Loading"
               srcDoc={DOG_SVG_HTML}
               style={{
-                width: 240,
-                height: 196,
+                width: 170,
+                height: 140,
                 border: 'none',
                 backgroundColor: 'transparent',
                 pointerEvents: 'none',
@@ -324,7 +324,7 @@ export function DogLoadingContent({ message = '' }) {
   );
 }
 
-export default function DogLoadingOverlay({ visible, message = '' }) {
+export default function DogLoadingOverlay({ visible, message = 'Carregando...' }) {
   if (!visible) return null;
 
   return (
@@ -363,13 +363,13 @@ const styles = StyleSheet.create({
     zIndex: 10,
   },
   dogWrapper: {
-    width: 240,
-    height: 196,
+    width: 170,
+    height: 140,
     backgroundColor: 'transparent',
   },
   webview: {
-    width: 240,
-    height: 196,
+    width: 170,
+    height: 140,
     backgroundColor: 'transparent',
   },
   loadingText: {

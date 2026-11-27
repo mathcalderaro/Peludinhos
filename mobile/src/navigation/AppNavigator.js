@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { StyleSheet } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
@@ -10,6 +11,7 @@ import { PatinhasIcon } from '../components/Icons';
 import { DogLoadingContent } from '../components/DogLoadingScreen';
 import { useAuth } from '../context/AuthContext';
 
+import OnboardingScreen from '../screens/OnboardingScreen';
 import LoginScreen from '../screens/LoginScreen';
 import CadastroScreen from '../screens/CadastroScreen';
 import AnimaisScreen from '../screens/AnimaisScreen';
@@ -65,16 +67,34 @@ function MainTabs() {
 export default function AppNavigator() {
   const { token, carregandoSessao } = useAuth();
   const [exibindoSplashInicial, setExibindoSplashInicial] = useState(true);
+  const [onboardingVisto, setOnboardingVisto] = useState(null);
 
   useEffect(() => {
+    AsyncStorage.getItem('@peludinhos:onboarding_visto')
+      .then((valor) => setOnboardingVisto(valor === 'true'))
+      .catch(() => setOnboardingVisto(true));
+
     const timer = setTimeout(() => {
       setExibindoSplashInicial(false);
     }, 1800);
     return () => clearTimeout(timer);
   }, []);
 
-  if (carregandoSessao || exibindoSplashInicial) {
-    return <DogLoadingContent />;
+  async function concluirOnboarding() {
+    setOnboardingVisto(true);
+    try {
+      await AsyncStorage.setItem('@peludinhos:onboarding_visto', 'true');
+    } catch (e) {
+      // ignora
+    }
+  }
+
+  if (carregandoSessao || exibindoSplashInicial || onboardingVisto === null) {
+    return <DogLoadingContent message="Carregando..." />;
+  }
+
+  if (!onboardingVisto && !token) {
+    return <OnboardingScreen onFinish={concluirOnboarding} />;
   }
 
   return (

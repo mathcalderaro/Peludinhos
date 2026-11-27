@@ -13,6 +13,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { COLORS } from '../theme/colors';
 import { SubHeader } from '../components/Header';
+import { PataFilterIcon } from '../components/Icons';
 
 export default function DetalhesAnimalScreen({ route, navigation }) {
   const animal = route.params?.animal || {
@@ -20,9 +21,14 @@ export default function DetalhesAnimalScreen({ route, navigation }) {
     especie: 'Cachorro',
     raca: 'Vira-lata',
     tempo: 'Visto há 1 hora',
+    dataAvistamento: 'Visto dia 10/10/2026',
     endereco: 'Av. Brasil, 1234 - Centro',
     sexo: 'Macho',
-    idade: '2 anos (aprox.)',
+    idade: '1 ano',
+    porte: 'Médio',
+    cor: 'Caramelo',
+    cadastradoPor: 'Projeto Peludinhos',
+    cadastradoLocal: 'UFOPA',
     castrado: true,
     chipado: true,
     vacinado: true,
@@ -51,8 +57,16 @@ export default function DetalhesAnimalScreen({ route, navigation }) {
       />
 
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
+        {/* Imagem Principal + Dots + Badge Chipado */}
         <View style={styles.imageContainer}>
           <Image source={{ uri: animal.foto }} style={styles.heroImage} />
+
+          <View style={styles.photoDotsRow}>
+            <View style={[styles.photoDot, styles.photoDotActive]} />
+            <View style={styles.photoDot} />
+            <View style={styles.photoDot} />
+            <View style={styles.photoDot} />
+          </View>
 
           {animal.chipado ? (
             <View style={styles.chipadoFloatingBadge}>
@@ -72,20 +86,76 @@ export default function DetalhesAnimalScreen({ route, navigation }) {
             {animal.especie} • {animal.raca || 'SRD'}
           </Text>
 
+          {/* Cards Laranja Claro: Sexo e Idade (igual referência) */}
+          <View style={styles.highlightCardsRow}>
+            <View style={styles.highlightCard}>
+              <View style={styles.highlightWatermark} pointerEvents="none">
+                <PataFilterIcon size={34} color="#F3A64C" />
+              </View>
+              <Text style={styles.highlightValue}>{animal.sexo || 'Macho'}</Text>
+              <Text style={styles.highlightLabel}>Sexo</Text>
+            </View>
+
+            <View style={styles.highlightCard}>
+              <View style={styles.highlightWatermark} pointerEvents="none">
+                <PataFilterIcon size={34} color="#F3A64C" />
+              </View>
+              <Text style={styles.highlightValue}>{animal.idade || '1 ano'}</Text>
+              <Text style={styles.highlightLabel}>Idade</Text>
+            </View>
+          </View>
+
+          {/* Localização e Data */}
           <View style={styles.locationRow}>
             <View style={styles.locationLeft}>
-              <Ionicons name="location-outline" size={18} color={COLORS.gray500} />
+              <Ionicons name="location" size={16} color={COLORS.gray400} />
               <Text style={styles.locationText}>
                 {animal.endereco || animal.local}
               </Text>
             </View>
-            <Text style={styles.timeText}>{animal.tempo}</Text>
+            <Text style={styles.timeText}>
+              {animal.dataAvistamento || animal.tempo}
+            </Text>
+          </View>
+
+          {/* Quem cadastrou */}
+          <View style={styles.authorCard}>
+            <View style={styles.authorLeft}>
+              <View style={styles.authorAvatar}>
+                <Image
+                  source={require('../../assets/favicon.png')}
+                  style={styles.authorAvatarImg}
+                  resizeMode="cover"
+                />
+              </View>
+              <View>
+                <Text style={styles.authorName}>
+                  {animal.cadastradoPor || 'Projeto Peludinhos'}
+                </Text>
+                <Text style={styles.authorOrg}>
+                  {animal.cadastradoLocal || 'UFOPA'}
+                </Text>
+              </View>
+            </View>
+
+            <TouchableOpacity
+              onPress={() =>
+                Alert.alert(
+                  'Contato do Cadastrador',
+                  `Registrado por: ${animal.cadastradoPor || 'Projeto Peludinhos'} (${animal.cadastradoLocal || 'UFOPA'})`
+                )
+              }
+              style={styles.chatIconBtn}
+            >
+              <Ionicons name="chatbox-ellipses" size={24} color={COLORS.gray300} />
+            </TouchableOpacity>
           </View>
 
           {animal.descricao ? (
             <Text style={styles.descriptionText}>{animal.descricao}</Text>
           ) : null}
 
+          {/* Seção Saúde */}
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Saúde</Text>
 
@@ -145,6 +215,7 @@ export default function DetalhesAnimalScreen({ route, navigation }) {
             </View>
           </View>
 
+          {/* Seção Informações */}
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Informações</Text>
 
@@ -155,7 +226,18 @@ export default function DetalhesAnimalScreen({ route, navigation }) {
               </View>
               <View style={styles.infoCol}>
                 <Text style={styles.infoLabel}>Idade</Text>
-                <Text style={styles.infoValue}>{animal.idade || '2 anos (aprox.)'}</Text>
+                <Text style={styles.infoValue}>{animal.idade || '1 ano'}</Text>
+              </View>
+            </View>
+
+            <View style={[styles.infoGrid, { marginTop: 16 }]}>
+              <View style={styles.infoCol}>
+                <Text style={styles.infoLabel}>Porte</Text>
+                <Text style={styles.infoValue}>{animal.porte || 'Médio'}</Text>
+              </View>
+              <View style={styles.infoCol}>
+                <Text style={styles.infoLabel}>Cor</Text>
+                <Text style={styles.infoValue}>{animal.cor || 'Caramelo'}</Text>
               </View>
             </View>
           </View>
@@ -175,7 +257,7 @@ const styles = StyleSheet.create({
   },
   imageContainer: {
     width: '100%',
-    height: 310,
+    height: 290,
     backgroundColor: COLORS.gray200,
     position: 'relative',
   },
@@ -183,9 +265,27 @@ const styles = StyleSheet.create({
     width: '100%',
     height: '100%',
   },
-  chipadoFloatingBadge: {
+  photoDotsRow: {
     position: 'absolute',
     bottom: 36,
+    left: 0,
+    right: 0,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    gap: 6,
+  },
+  photoDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: 'rgba(255,255,255,0.75)',
+  },
+  photoDotActive: {
+    backgroundColor: COLORS.brandOrange,
+  },
+  chipadoFloatingBadge: {
+    position: 'absolute',
+    bottom: 34,
     right: 16,
     backgroundColor: COLORS.brandTeal,
     paddingHorizontal: 12,
@@ -207,15 +307,15 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 28,
     borderTopRightRadius: 28,
     marginTop: -24,
-    paddingHorizontal: 24,
-    paddingTop: 24,
+    paddingHorizontal: 22,
+    paddingTop: 22,
     paddingBottom: 40,
   },
   titleRow: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
-    marginBottom: 4,
+    marginBottom: 2,
   },
   animalName: {
     fontSize: 24,
@@ -226,12 +326,46 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '500',
     color: COLORS.gray600,
+    marginBottom: 16,
+  },
+  highlightCardsRow: {
+    flexDirection: 'row',
+    gap: 14,
+    marginBottom: 18,
+  },
+  highlightCard: {
+    width: 112,
+    height: 76,
+    backgroundColor: '#FDE8CD',
+    borderRadius: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
+    position: 'relative',
+    overflow: 'hidden',
+    paddingHorizontal: 8,
+  },
+  highlightWatermark: {
+    position: 'absolute',
+    left: -4,
+    bottom: -4,
+    opacity: 0.75,
+  },
+  highlightValue: {
+    fontSize: 15,
+    fontWeight: '700',
+    color: COLORS.gray900,
+    zIndex: 2,
+  },
+  highlightLabel: {
+    fontSize: 12,
+    color: COLORS.gray600,
+    marginTop: 2,
+    zIndex: 2,
   },
   locationRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginTop: 16,
     paddingBottom: 16,
     borderBottomWidth: 1,
     borderBottomColor: COLORS.gray100,
@@ -241,6 +375,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 6,
     flex: 1,
+    paddingRight: 8,
   },
   locationText: {
     fontSize: 13,
@@ -250,6 +385,45 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: COLORS.gray400,
   },
+  authorCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingVertical: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: COLORS.gray100,
+  },
+  authorLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 14,
+  },
+  authorAvatar: {
+    width: 52,
+    height: 52,
+    borderRadius: 26,
+    backgroundColor: '#0E4F4F',
+    overflow: 'hidden',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  authorAvatarImg: {
+    width: 52,
+    height: 52,
+  },
+  authorName: {
+    fontSize: 15,
+    fontWeight: '700',
+    color: COLORS.gray900,
+  },
+  authorOrg: {
+    fontSize: 13,
+    color: COLORS.gray500,
+    marginTop: 2,
+  },
+  chatIconBtn: {
+    padding: 8,
+  },
   descriptionText: {
     marginTop: 14,
     fontSize: 14,
@@ -257,7 +431,7 @@ const styles = StyleSheet.create({
     lineHeight: 20,
   },
   section: {
-    marginTop: 24,
+    marginTop: 22,
   },
   sectionTitle: {
     fontSize: 18,

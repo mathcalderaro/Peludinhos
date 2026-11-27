@@ -17,6 +17,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { COLORS } from '../theme/colors';
 import { SubHeader } from '../components/Header';
 import { usePets } from '../context/PetsContext';
+import { useAuth } from '../context/AuthContext';
 import { RACAS_CACHORRO, RACAS_GATO } from '../data/racas';
 
 const STEPS = [
@@ -28,6 +29,7 @@ const STEPS = [
 
 export default function NovoAvistamentoScreen({ route, navigation }) {
   const { adicionarAvistamento, editarAnimal } = usePets();
+  const { usuario } = useAuth();
   const animalParaEditar = route.params?.animalParaEditar || null;
   const modoEdicao = Boolean(animalParaEditar);
 
@@ -36,6 +38,14 @@ export default function NovoAvistamentoScreen({ route, navigation }) {
   const [especie, setEspecie] = useState(animalParaEditar?.especie || 'Cachorro');
   const [raca, setRaca] = useState(animalParaEditar?.raca || '');
   const [mostrarRacas, setMostrarRacas] = useState(false);
+
+  const [sexo, setSexo] = useState(animalParaEditar?.sexo || 'Macho');
+  const [idade, setIdade] = useState(animalParaEditar?.idade || '');
+  const [porte, setPorte] = useState(animalParaEditar?.porte || 'Médio');
+  const [cor, setCor] = useState(animalParaEditar?.cor || '');
+  const [cadastradoPor, setCadastradoPor] = useState(
+    animalParaEditar?.cadastradoPor || usuario?.nome || 'Projeto Peludinhos'
+  );
 
   const [local, setLocal] = useState(
     animalParaEditar?.endereco || animalParaEditar?.local || ''
@@ -113,7 +123,7 @@ export default function NovoAvistamentoScreen({ route, navigation }) {
           }
         }
       } catch (geoErr) {
-        // Fallback para coordenadas formatadas
+        // Fallback para coordenadas
       }
 
       setLocal(`Local atual (${latitude.toFixed(4)}, ${longitude.toFixed(4)})`);
@@ -133,6 +143,11 @@ export default function NovoAvistamentoScreen({ route, navigation }) {
         nome,
         especie,
         raca,
+        sexo,
+        idade,
+        porte,
+        cor,
+        cadastradoPor,
         local: local || 'Centro',
         lat: coords?.lat,
         lng: coords?.lng,
@@ -155,6 +170,11 @@ export default function NovoAvistamentoScreen({ route, navigation }) {
       nome,
       especie,
       raca,
+      sexo,
+      idade,
+      porte,
+      cor,
+      cadastradoPor,
       local: local || 'Centro',
       lat: coords?.lat,
       lng: coords?.lng,
@@ -191,7 +211,7 @@ export default function NovoAvistamentoScreen({ route, navigation }) {
           {STEPS.map((step, index) => {
             const ativo =
               index === 0 ||
-              (index === 1 && (nome.length > 0 || raca.length > 0 || descricao.length > 0)) ||
+              (index === 1 && (nome.length > 0 || raca.length > 0 || idade.length > 0 || descricao.length > 0)) ||
               (index === 2 && (castrado || vacinado || chipado)) ||
               (index === 3 && local.length > 0);
             return (
@@ -259,6 +279,7 @@ export default function NovoAvistamentoScreen({ route, navigation }) {
             </View>
           </View>
 
+          {/* Raça com Seleção / Autocomplete */}
           <View>
             <Text style={styles.label}>Raça (opcional)</Text>
             <View style={styles.inputActionWrapper}>
@@ -330,6 +351,75 @@ export default function NovoAvistamentoScreen({ route, navigation }) {
             ) : null}
           </View>
 
+          {/* Gênero e Idade */}
+          <View style={styles.twoColRow}>
+            <View style={{ flex: 1 }}>
+              <Text style={styles.label}>Gênero</Text>
+              <View style={styles.speciesBox}>
+                {['Macho', 'Fêmea'].map((gen) => {
+                  const ativo = sexo === gen;
+                  return (
+                    <TouchableOpacity
+                      key={gen}
+                      style={[styles.speciesBtn, ativo && styles.speciesBtnActive]}
+                      onPress={() => setSexo(gen)}
+                    >
+                      <Text style={[styles.speciesText, ativo && styles.speciesTextActive]}>
+                        {gen}
+                      </Text>
+                    </TouchableOpacity>
+                  );
+                })}
+              </View>
+            </View>
+
+            <View style={{ flex: 1 }}>
+              <Text style={styles.label}>Idade (aprox.)</Text>
+              <TextInput
+                style={styles.input}
+                placeholder="Ex: 1 ano, 6 meses"
+                placeholderTextColor={COLORS.gray400}
+                value={idade}
+                onChangeText={setIdade}
+              />
+            </View>
+          </View>
+
+          {/* Porte e Cor */}
+          <View style={styles.twoColRow}>
+            <View style={{ flex: 1 }}>
+              <Text style={styles.label}>Porte</Text>
+              <View style={styles.speciesBox}>
+                {['Pequeno', 'Médio', 'Grande'].map((p) => {
+                  const ativo = porte === p;
+                  return (
+                    <TouchableOpacity
+                      key={p}
+                      style={[styles.speciesBtn, ativo && styles.speciesBtnActive]}
+                      onPress={() => setPorte(p)}
+                    >
+                      <Text style={[styles.speciesText, { fontSize: 12 }, ativo && styles.speciesTextActive]}>
+                        {p}
+                      </Text>
+                    </TouchableOpacity>
+                  );
+                })}
+              </View>
+            </View>
+          </View>
+
+          <View>
+            <Text style={styles.label}>Cor (opcional)</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Ex: Caramelo, Preto, Rajado..."
+              placeholderTextColor={COLORS.gray400}
+              value={cor}
+              onChangeText={setCor}
+            />
+          </View>
+
+          {/* Saúde */}
           <View>
             <Text style={styles.label}>Saúde (opcional)</Text>
             <View style={styles.healthRow}>
@@ -377,6 +467,7 @@ export default function NovoAvistamentoScreen({ route, navigation }) {
             </View>
           </View>
 
+          {/* Localização com Pin */}
           <View>
             <Text style={styles.label}>Localização</Text>
             <View style={styles.locationInputRow}>
@@ -416,6 +507,19 @@ export default function NovoAvistamentoScreen({ route, navigation }) {
             </TouchableOpacity>
           </View>
 
+          {/* Quem cadastrou */}
+          <View>
+            <Text style={styles.label}>Quem cadastrou</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Seu nome ou projeto (ex: Projeto Peludinhos)"
+              placeholderTextColor={COLORS.gray400}
+              value={cadastradoPor}
+              onChangeText={setCadastradoPor}
+            />
+          </View>
+
+          {/* Descrição */}
           <View>
             <Text style={styles.label}>Descrição</Text>
             <View style={styles.textareaWrapper}>
@@ -538,6 +642,11 @@ const styles = StyleSheet.create({
   },
   form: {
     gap: 16,
+  },
+  twoColRow: {
+    flexDirection: 'row',
+    gap: 12,
+    alignItems: 'flex-end',
   },
   label: {
     fontSize: 14,

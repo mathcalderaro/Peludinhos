@@ -109,7 +109,7 @@ export default function CadastroScreen({ navigation }) {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <DogLoadingOverlay visible={carregando} message="Criando conta..." />
+      <DogLoadingOverlay visible={carregando} message="Carregando..." />
       <KeyboardAvoidingView
         style={{ flex: 1 }}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
