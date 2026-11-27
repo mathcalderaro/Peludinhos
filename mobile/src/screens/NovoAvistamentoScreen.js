@@ -138,6 +138,11 @@ export default function NovoAvistamentoScreen({ route, navigation }) {
   }
 
   function handleSalvar() {
+    if (!fotoUri) {
+      Alert.alert('Foto obrigatória', 'Por favor, adicione uma foto do animal antes de continuar.');
+      return;
+    }
+
     if (modoEdicao) {
       const atualizado = editarAnimal(animalParaEditar.id, {
         nome,
@@ -239,7 +244,7 @@ export default function NovoAvistamentoScreen({ route, navigation }) {
               <View style={styles.uploadIconCircle}>
                 <Ionicons name="camera" size={22} color={COLORS.white} />
               </View>
-              <Text style={styles.uploadText}>Adicionar foto{'\n'}do animal</Text>
+              <Text style={styles.uploadText}>Adicionar foto{'\n'}do animal *</Text>
             </>
           )}
         </TouchableOpacity>
@@ -374,7 +379,7 @@ export default function NovoAvistamentoScreen({ route, navigation }) {
             </View>
 
             <View style={{ flex: 1 }}>
-              <Text style={styles.label}>Idade (aprox.)</Text>
+              <Text style={styles.label}>Idade aprox. (opcional)</Text>
               <TextInput
                 style={styles.input}
                 placeholder="Ex: 1 ano, 6 meses"
@@ -507,16 +512,22 @@ export default function NovoAvistamentoScreen({ route, navigation }) {
             </TouchableOpacity>
           </View>
 
-          {/* Quem cadastrou */}
+          {/* Quem cadastrou (somente leitura) */}
           <View>
             <Text style={styles.label}>Quem cadastrou</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="Seu nome ou projeto (ex: Projeto Peludinhos)"
-              placeholderTextColor={COLORS.gray400}
-              value={cadastradoPor}
-              onChangeText={setCadastradoPor}
-            />
+            <View style={styles.inputActionWrapper}>
+              <TextInput
+                style={[styles.input, { backgroundColor: COLORS.gray100, color: COLORS.gray500, paddingRight: 40 }]}
+                value={cadastradoPor}
+                editable={false}
+              />
+              <Ionicons
+                name="lock-closed"
+                size={16}
+                color={COLORS.gray400}
+                style={{ position: 'absolute', right: 14 }}
+              />
+            </View>
           </View>
 
           {/* Descrição */}

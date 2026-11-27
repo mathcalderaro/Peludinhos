@@ -186,11 +186,19 @@ export default function MapaScreen({ navigation }) {
                     <Text style={styles.sightingMeta}>
                       {item.tempo} • {item.local}
                     </Text>
-                    <View style={[styles.sightingBadge, styles.badgeTeal]}>
-                      <Text style={[styles.sightingBadgeText, styles.badgeTealText]}>
-                        {item.castrado ? 'Castrado' : 'Não castrado'}
-                      </Text>
-                    </View>
+                    {item.castrado ? (
+                      <View style={[styles.sightingBadge, styles.badgeTeal]}>
+                        <Text style={[styles.sightingBadgeText, styles.badgeTealText]}>
+                          Castrado
+                        </Text>
+                      </View>
+                    ) : item.chipado ? (
+                      <View style={[styles.sightingBadge, styles.badgeTeal]}>
+                        <Text style={[styles.sightingBadgeText, styles.badgeTealText]}>
+                          Chipado
+                        </Text>
+                      </View>
+                    ) : null}
                   </View>
                 </View>
                 <Ionicons name="chevron-forward" size={20} color={COLORS.gray400} />

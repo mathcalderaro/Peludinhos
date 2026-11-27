@@ -104,11 +104,7 @@ export default function AnimaisScreen({ navigation }) {
               <View style={styles.tagTeal}>
                 <Text style={styles.tagTealText}>Castrado</Text>
               </View>
-            ) : (
-              <View style={styles.tagTeal}>
-                <Text style={styles.tagTealText}>Não castrado</Text>
-              </View>
-            )}
+            ) : null}
 
             {item.vacinado && !item.castrado ? (
               <View style={styles.tagTeal}>

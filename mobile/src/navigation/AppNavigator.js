@@ -65,7 +65,7 @@ function MainTabs() {
 }
 
 export default function AppNavigator() {
-  const { token, carregandoSessao } = useAuth();
+  const { token, carregandoSessao, mostrarBoasVindas, concluirBoasVindas } = useAuth();
   const [exibindoSplashInicial, setExibindoSplashInicial] = useState(true);
   const [onboardingVisto, setOnboardingVisto] = useState(null);
 
@@ -91,6 +91,10 @@ export default function AppNavigator() {
 
   if (carregandoSessao || exibindoSplashInicial || onboardingVisto === null) {
     return <DogLoadingContent message="Carregando..." />;
+  }
+
+  if (token && mostrarBoasVindas) {
+    return <OnboardingScreen onFinish={concluirBoasVindas} />;
   }
 
   if (!onboardingVisto && !token) {

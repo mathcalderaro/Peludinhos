@@ -35,6 +35,9 @@ export default function PerfilScreen({ navigation }) {
   } = useAuth();
   const { animais, perdidos } = usePets();
 
+  const meusAvistamentosCount = animais.filter((a) => a.cadastradoPeloUsuario).length;
+  const meusPerdidosCount = perdidos.filter((p) => p.cadastradoPeloUsuario).length;
+
   const [modo, setModo] = useState('visualizacao');
   const [carregando, setCarregando] = useState(false);
   const [salvando, setSalvando] = useState(false);
@@ -228,7 +231,7 @@ export default function PerfilScreen({ navigation }) {
                 activeOpacity={0.8}
                 onPress={() => navigation.navigate('Animais')}
               >
-                <Text style={styles.statNumber}>{animais.length}</Text>
+                <Text style={styles.statNumber}>{meusAvistamentosCount}</Text>
                 <Text style={styles.statLabel}>Avistamentos</Text>
               </TouchableOpacity>
 
@@ -239,7 +242,7 @@ export default function PerfilScreen({ navigation }) {
                 activeOpacity={0.8}
                 onPress={() => navigation.navigate('Perdidos')}
               >
-                <Text style={styles.statNumber}>{perdidos.length}</Text>
+                <Text style={styles.statNumber}>{meusPerdidosCount}</Text>
                 <Text style={styles.statLabel}>Perdidos</Text>
               </TouchableOpacity>
             </View>

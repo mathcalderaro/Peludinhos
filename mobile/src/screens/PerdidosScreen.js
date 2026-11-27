@@ -73,6 +73,10 @@ export default function PerdidosScreen() {
   }
 
   function handleSalvarFuga() {
+    if (!fotoUri) {
+      Alert.alert('Foto obrigatória', 'Escolha uma foto do animal antes de publicar o alerta.');
+      return;
+    }
     if (!nome.trim() || !vistoEm.trim()) {
       Alert.alert('Campos obrigatórios', 'Informe o nome do animal e o bairro onde foi visto.');
       return;
@@ -277,7 +281,7 @@ export default function PerdidosScreen() {
               ) : (
                 <>
                   <Ionicons name="camera" size={24} color={COLORS.red500} />
-                  <Text style={styles.photoPickerText}>Escolher foto do animal</Text>
+                  <Text style={styles.photoPickerText}>Escolher foto do animal *</Text>
                 </>
               )}
             </TouchableOpacity>

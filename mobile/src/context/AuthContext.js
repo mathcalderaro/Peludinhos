@@ -42,6 +42,7 @@ export function AuthProvider({ children }) {
   const [token, setToken] = useState(null);
   const [usuario, setUsuario] = useState(null);
   const [carregandoSessao, setCarregandoSessao] = useState(true);
+  const [mostrarBoasVindas, setMostrarBoasVindas] = useState(false);
   const [baseUrl, setBaseUrl] = useState(getDefaultBaseUrl());
 
   useEffect(() => {
@@ -126,10 +127,16 @@ export function AuthProvider({ children }) {
         return { ok: false, erro: dados.erro || 'Não foi possível realizar o login.' };
       }
 
+      const emailNorm = email.trim().toLowerCase();
+      const pendente = await AsyncStorage.getItem(`@peludinhos:boas_vindas_pendente:${emailNorm}`);
+
       await AsyncStorage.setItem('@peludinhos:token', dados.token);
       await AsyncStorage.setItem('@peludinhos:usuario', JSON.stringify(dados.usuario));
       setToken(dados.token);
       setUsuario(dados.usuario);
+      if (pendente === 'true') {
+        setMostrarBoasVindas(true);
+      }
 
       return { ok: true };
     } catch (erro) {
@@ -140,11 +147,16 @@ export function AuthProvider({ children }) {
       );
 
       if (encontrado) {
+        const emailNorm = email.trim().toLowerCase();
+        const pendente = await AsyncStorage.getItem(`@peludinhos:boas_vindas_pendente:${emailNorm}`);
         const demoToken = 'local-jwt-token';
         await AsyncStorage.setItem('@peludinhos:token', demoToken);
         await AsyncStorage.setItem('@peludinhos:usuario', JSON.stringify(encontrado));
         setToken(demoToken);
         setUsuario(encontrado);
+        if (pendente === 'true') {
+          setMostrarBoasVindas(true);
+        }
         return { ok: true, modoLocal: true };
       }
 
@@ -195,6 +207,9 @@ export function AuthProvider({ children }) {
         };
       }
 
+      const emailNorm = email.trim().toLowerCase();
+      await AsyncStorage.setItem(`@peludinhos:boas_vindas_pendente:${emailNorm}`, 'true');
+
       return { ok: true, usuario: dados.usuario };
     } catch (erro) {
       const localUsersRaw = await AsyncStorage.getItem('@peludinhos:usuarios_locais');
@@ -217,6 +232,10 @@ export function AuthProvider({ children }) {
 
       localUsers.push(novoUsuario);
       await AsyncStorage.setItem('@peludinhos:usuarios_locais', JSON.stringify(localUsers));
+      await AsyncStorage.setItem(
+        `@peludinhos:boas_vindas_pendente:${email.trim().toLowerCase()}`,
+        'true'
+      );
       return { ok: true, usuario: novoUsuario, modoLocal: true };
     }
   }
@@ -325,11 +344,21 @@ export function AuthProvider({ children }) {
     }
   }
 
+  async function concluirBoasVindas() {
+    setMostrarBoasVindas(false);
+    if (usuario?.email) {
+      await AsyncStorage.removeItem(
+        `@peludinhos:boas_vindas_pendente:${usuario.email.toLowerCase()}`
+      );
+    }
+  }
+
   async function sair() {
     await AsyncStorage.removeItem('@peludinhos:token');
     await AsyncStorage.removeItem('@peludinhos:usuario');
     setToken(null);
     setUsuario(null);
+    setMostrarBoasVindas(false);
   }
 
   return (
@@ -338,6 +367,8 @@ export function AuthProvider({ children }) {
         token,
         usuario,
         carregandoSessao,
+        mostrarBoasVindas,
+        concluirBoasVindas,
         baseUrl,
         alterarBaseUrl,
         resolverUrlFoto,

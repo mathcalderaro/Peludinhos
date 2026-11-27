@@ -130,6 +130,7 @@ export function PetsProvider({ children }) {
     const hoje = new Date().toLocaleDateString('pt-BR');
     const novoAnimal = {
       id: String(Date.now()),
+      cadastradoPeloUsuario: true,
       nome: novo.nome?.trim() || novo.especie || 'Sem nome',
       especie: novo.especie || 'Cachorro',
       raca: novo.raca?.trim() || 'SRD',
@@ -138,7 +139,7 @@ export function PetsProvider({ children }) {
       local: novo.local?.trim() || 'Santarém',
       endereco: novo.local?.trim() || 'Localização registrada pelo app',
       sexo: novo.sexo || 'Macho',
-      idade: novo.idade?.trim() || '1 ano (aprox.)',
+      idade: novo.idade?.trim() || 'Não informada',
       porte: novo.porte || 'Médio',
       cor: novo.cor?.trim() || 'Não informada',
       cadastradoPor: novo.cadastradoPor?.trim() || 'Projeto Peludinhos',
@@ -203,6 +204,7 @@ export function PetsProvider({ children }) {
   function adicionarPerdido(novo) {
     const novoPerdido = {
       id: 'p' + Date.now(),
+      cadastradoPeloUsuario: true,
       nome: novo.nome?.trim() || 'Animal sem nome',
       especie: novo.especie || 'Cachorro',
       vistoEm: novo.vistoEm?.trim() || 'Centro',

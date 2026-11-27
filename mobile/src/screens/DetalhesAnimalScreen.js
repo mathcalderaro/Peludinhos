@@ -180,18 +180,19 @@ export default function DetalhesAnimalScreen({ route, navigation }) {
                   <Ionicons name="checkmark-circle" size={16} color={COLORS.teal700} />
                   <Text style={styles.healthBadgeText}>Castrado</Text>
                 </View>
-              ) : (
-                <View style={styles.healthBadge}>
-                  <Ionicons name="information-circle" size={16} color={COLORS.teal700} />
-                  <Text style={styles.healthBadgeText}>Não castrado</Text>
-                </View>
-              )}
+              ) : null}
 
               {animal.chipado ? (
                 <View style={styles.healthBadge}>
                   <Ionicons name="checkmark-circle" size={16} color={COLORS.teal700} />
                   <Text style={styles.healthBadgeText}>Chipado</Text>
                 </View>
+              ) : null}
+
+              {!animal.vacinado && !animal.castrado && !animal.chipado ? (
+                <Text style={{ fontSize: 13, color: COLORS.gray400 }}>
+                  Nenhuma informação de saúde registrada.
+                </Text>
               ) : null}
             </View>
 
