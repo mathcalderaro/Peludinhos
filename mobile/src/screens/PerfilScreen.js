@@ -8,21 +8,23 @@ import {
   ScrollView,
   StyleSheet,
   ActivityIndicator,
+  Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import * as ImagePicker from 'expo-image-picker';
 import { Ionicons, FontAwesome5 } from '@expo/vector-icons';
 import { COLORS } from '../theme/colors';
 import { useAuth, formatarTelefone } from '../context/AuthContext';
+import { usePets } from '../context/PetsContext';
 
 function formatarMembroDesde(dataCadastro) {
-  if (!dataCadastro) return '';
+  if (!dataCadastro) return 'Membro ativo';
   const data = new Date(dataCadastro);
-  if (isNaN(data)) return '';
+  if (isNaN(data)) return 'Membro ativo';
   return 'Membro desde ' + data.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' });
 }
 
-export default function PerfilScreen() {
+export default function PerfilScreen({ navigation }) {
   const {
     usuario,
     carregarPerfil,
@@ -31,6 +33,7 @@ export default function PerfilScreen() {
     resolverUrlFoto,
     sair,
   } = useAuth();
+  const { animais, perdidos } = usePets();
 
   const [modo, setModo] = useState('visualizacao');
   const [carregando, setCarregando] = useState(false);
@@ -173,94 +176,173 @@ export default function PerfilScreen() {
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
       >
-        <View style={styles.topBar}>
-          <View style={{ width: 40 }} />
-          <Image
-            source={require('../../assets/logo.png')}
-            style={styles.topLogo}
-            resizeMode="contain"
-          />
-          <View style={{ width: 40 }} />
-        </View>
-
         {carregando && !usuario ? (
           <View style={styles.loadingBox}>
             <ActivityIndicator size="large" color={COLORS.brandTeal} />
           </View>
         ) : null}
 
-        {modo !== 'editar' && usuario ? (
-          <View style={styles.profileHeader}>
-            <View style={styles.avatarCircle}>
-              {resolverUrlFoto(usuario.foto_perfil) ? (
-                <Image
-                  source={{ uri: resolverUrlFoto(usuario.foto_perfil) }}
-                  style={styles.avatarImg}
-                />
-              ) : (
-                <Ionicons name="person" size={44} color={COLORS.gray300} />
-              )}
-            </View>
-            <Text style={styles.userName}>{usuario.nome}</Text>
-            <Text style={styles.memberSince}>
-              {formatarMembroDesde(usuario.data_cadastro)}
-            </Text>
-          </View>
-        ) : null}
-
         {avisoSucesso ? (
           <View style={styles.successBanner}>
+            <Ionicons name="checkmark-circle" size={18} color={COLORS.teal700} />
             <Text style={styles.successBannerText}>{avisoSucesso}</Text>
           </View>
         ) : null}
 
+        {/* MODO VISUALIZAÇÃO (Tela com visual autêntico de Perfil) */}
         {modo === 'visualizacao' && usuario ? (
-          <View style={styles.viewModeContainer}>
-            <View style={styles.infoList}>
-              <View style={styles.infoCard}>
-                <Ionicons name="mail-outline" size={20} color={COLORS.gray400} />
-                <View style={{ flex: 1 }}>
-                  <Text style={styles.infoLabel}>E-mail</Text>
-                  <Text style={styles.infoValue}>{usuario.email}</Text>
-                </View>
+          <View>
+            {/* Card Principal do Usuário */}
+            <View style={styles.profileCard}>
+              <View style={styles.avatarWrapper}>
+                {resolverUrlFoto(usuario.foto_perfil) ? (
+                  <Image
+                    source={{ uri: resolverUrlFoto(usuario.foto_perfil) }}
+                    style={styles.avatarImg}
+                  />
+                ) : (
+                  <Ionicons name="person" size={44} color={COLORS.gray300} />
+                )}
               </View>
 
-              <View style={styles.infoCard}>
-                <Ionicons name="phone-portrait-outline" size={20} color={COLORS.gray400} />
-                <View style={{ flex: 1 }}>
-                  <Text style={styles.infoLabel}>Celular</Text>
-                  <Text style={styles.infoValue}>
-                    {usuario.telefone ? formatarTelefone(usuario.telefone) : 'Não informado'}
-                  </Text>
-                </View>
+              <Text style={styles.userName}>{usuario.nome}</Text>
+              <Text style={styles.userEmail}>{usuario.email}</Text>
+              <Text style={styles.memberSince}>
+                {formatarMembroDesde(usuario.data_cadastro)}
+              </Text>
+
+              <TouchableOpacity
+                style={styles.editProfilePill}
+                activeOpacity={0.8}
+                onPress={abrirEdicao}
+              >
+                <Ionicons name="create-outline" size={16} color={COLORS.teal700} />
+                <Text style={styles.editProfilePillText}>Editar Perfil</Text>
+              </TouchableOpacity>
+            </View>
+
+            {/* Estatísticas Rápidas */}
+            <View style={styles.statsRow}>
+              <TouchableOpacity
+                style={styles.statBox}
+                activeOpacity={0.8}
+                onPress={() => navigation.navigate('Animais')}
+              >
+                <Text style={styles.statNumber}>{animais.length}</Text>
+                <Text style={styles.statLabel}>Avistamentos</Text>
+              </TouchableOpacity>
+
+              <View style={styles.statDivider} />
+
+              <TouchableOpacity
+                style={styles.statBox}
+                activeOpacity={0.8}
+                onPress={() => navigation.navigate('Perdidos')}
+              >
+                <Text style={styles.statNumber}>{perdidos.length}</Text>
+                <Text style={styles.statLabel}>Perdidos</Text>
+              </TouchableOpacity>
+            </View>
+
+            {/* Informações de Contato */}
+            <View style={styles.contactCard}>
+              <View style={styles.contactRow}>
+                <Ionicons name="call-outline" size={18} color={COLORS.brandTeal} />
+                <Text style={styles.contactText}>
+                  {usuario.telefone ? formatarTelefone(usuario.telefone) : 'Celular não informado'}
+                </Text>
               </View>
             </View>
 
-            <TouchableOpacity style={styles.orangeButton} onPress={abrirEdicao}>
-              <Text style={styles.orangeButtonText}>Editar perfil</Text>
-              <FontAwesome5 name="paw" size={15} color={COLORS.white} />
-            </TouchableOpacity>
+            {/* Lista de Opções do Perfil */}
+            <View style={styles.menuList}>
+              <TouchableOpacity
+                style={styles.menuItem}
+                activeOpacity={0.75}
+                onPress={() => navigation.navigate('Animais')}
+              >
+                <View style={styles.menuItemLeft}>
+                  <View style={[styles.menuIconBox, { backgroundColor: COLORS.orange50 }]}>
+                    <FontAwesome5 name="paw" size={18} color={COLORS.brandOrange} />
+                  </View>
+                  <Text style={styles.menuItemText}>Meus Avistamentos</Text>
+                </View>
+                <Ionicons name="chevron-forward" size={20} color={COLORS.gray400} />
+              </TouchableOpacity>
 
-            <TouchableOpacity style={styles.outlineButton} onPress={abrirAlterarSenha}>
-              <Text style={styles.outlineButtonText}>Alterar senha</Text>
-            </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.menuItem}
+                activeOpacity={0.75}
+                onPress={() => navigation.navigate('Perdidos')}
+              >
+                <View style={styles.menuItemLeft}>
+                  <View style={[styles.menuIconBox, { backgroundColor: COLORS.red50 }]}>
+                    <Ionicons name="megaphone" size={20} color={COLORS.red500} />
+                  </View>
+                  <Text style={styles.menuItemText}>Meus Anúncios (Perdidos)</Text>
+                </View>
+                <Ionicons name="chevron-forward" size={20} color={COLORS.gray400} />
+              </TouchableOpacity>
 
-            <View style={styles.dividerContainer}>
-              <View style={styles.dividerLine} />
-              <Text style={styles.dividerText}>ou</Text>
-              <View style={styles.dividerLine} />
+              <TouchableOpacity
+                style={styles.menuItem}
+                activeOpacity={0.75}
+                onPress={abrirAlterarSenha}
+              >
+                <View style={styles.menuItemLeft}>
+                  <View style={[styles.menuIconBox, { backgroundColor: COLORS.teal50 }]}>
+                    <Ionicons name="lock-closed" size={20} color={COLORS.brandTeal} />
+                  </View>
+                  <Text style={styles.menuItemText}>Alterar Senha</Text>
+                </View>
+                <Ionicons name="chevron-forward" size={20} color={COLORS.gray400} />
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={styles.menuItem}
+                activeOpacity={0.75}
+                onPress={() =>
+                  Alert.alert(
+                    'Ajuda e Suporte',
+                    'Projeto Peludinhos - UFOPA.\nPara dúvidas ou sugestões, procure a equipe do projeto.'
+                  )
+                }
+              >
+                <View style={styles.menuItemLeft}>
+                  <View style={[styles.menuIconBox, { backgroundColor: COLORS.gray100 }]}>
+                    <Ionicons name="help-circle" size={20} color={COLORS.gray600} />
+                  </View>
+                  <Text style={styles.menuItemText}>Ajuda e Suporte</Text>
+                </View>
+                <Ionicons name="chevron-forward" size={20} color={COLORS.gray400} />
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={[styles.menuItem, styles.logoutCard]}
+                activeOpacity={0.75}
+                onPress={sair}
+              >
+                <View style={styles.menuItemLeft}>
+                  <View style={[styles.menuIconBox, { backgroundColor: COLORS.red100 }]}>
+                    <Ionicons name="log-out-outline" size={20} color={COLORS.red600} />
+                  </View>
+                  <Text style={[styles.menuItemText, { color: COLORS.red600 }]}>Sair da Conta</Text>
+                </View>
+              </TouchableOpacity>
             </View>
-
-            <TouchableOpacity style={styles.logoutButton} onPress={sair}>
-              <Ionicons name="log-out-outline" size={18} color={COLORS.red500} />
-              <Text style={styles.logoutText}>Sair da conta</Text>
-            </TouchableOpacity>
           </View>
         ) : null}
 
+        {/* MODO EDITAR PERFIL */}
         {modo === 'editar' ? (
           <View style={styles.formContainer}>
-            <Text style={styles.formTitle}>Editar perfil</Text>
+            <View style={styles.subModeHeader}>
+              <TouchableOpacity onPress={() => setModo('visualizacao')} style={styles.backIconBtn}>
+                <Ionicons name="arrow-back" size={22} color={COLORS.gray700} />
+              </TouchableOpacity>
+              <Text style={styles.formTitle}>Editar Perfil</Text>
+              <View style={{ width: 30 }} />
+            </View>
 
             <View style={styles.editPhotoSection}>
               <TouchableOpacity style={styles.editAvatarCircle} onPress={escolherNovaFoto}>
@@ -365,9 +447,16 @@ export default function PerfilScreen() {
           </View>
         ) : null}
 
+        {/* MODO ALTERAR SENHA */}
         {modo === 'senha' ? (
           <View style={styles.formContainer}>
-            <Text style={styles.formTitle}>Alterar senha</Text>
+            <View style={styles.subModeHeader}>
+              <TouchableOpacity onPress={() => setModo('visualizacao')} style={styles.backIconBtn}>
+                <Ionicons name="arrow-back" size={22} color={COLORS.gray700} />
+              </TouchableOpacity>
+              <Text style={styles.formTitle}>Alterar Senha</Text>
+              <View style={{ width: 30 }} />
+            </View>
 
             <View>
               <View style={styles.inputWrapper}>
@@ -488,165 +577,206 @@ export default function PerfilScreen() {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.surface,
   },
   scrollContent: {
-    paddingHorizontal: 24,
-    paddingTop: 14,
+    paddingHorizontal: 18,
+    paddingTop: 18,
     paddingBottom: 90,
-  },
-  topBar: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginBottom: 20,
-  },
-  topLogo: {
-    width: 140,
-    height: 48,
   },
   loadingBox: {
     paddingVertical: 60,
     alignItems: 'center',
   },
-  profileHeader: {
-    alignItems: 'center',
-    marginBottom: 26,
-  },
-  avatarCircle: {
-    width: 112,
-    height: 112,
-    borderRadius: 56,
-    borderWidth: 2,
-    borderColor: COLORS.brandTeal,
-    backgroundColor: COLORS.gray50,
-    alignItems: 'center',
-    justifyContent: 'center',
-    overflow: 'hidden',
-    marginBottom: 16,
-  },
-  avatarImg: {
-    width: '100%',
-    height: '100%',
-  },
-  userName: {
-    fontSize: 26,
-    fontWeight: '700',
-    color: COLORS.brandTeal,
-    textAlign: 'center',
-    marginBottom: 4,
-  },
-  memberSince: {
-    fontSize: 13,
-    color: COLORS.gray500,
-  },
   successBanner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
     backgroundColor: COLORS.teal50,
     borderWidth: 1,
     borderColor: COLORS.teal100,
     borderRadius: 14,
-    paddingHorizontal: 16,
+    paddingHorizontal: 14,
     paddingVertical: 12,
-    marginBottom: 16,
+    marginBottom: 14,
   },
   successBannerText: {
     fontSize: 13,
     fontWeight: '600',
     color: COLORS.teal700,
   },
-  viewModeContainer: {
+  profileCard: {
+    backgroundColor: COLORS.white,
+    borderRadius: 24,
+    padding: 22,
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: COLORS.gray100,
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
+    marginBottom: 14,
+  },
+  avatarWrapper: {
+    width: 96,
+    height: 96,
+    borderRadius: 48,
+    borderWidth: 3,
+    borderColor: COLORS.teal100,
+    backgroundColor: COLORS.gray100,
+    alignItems: 'center',
+    justifyContent: 'center',
+    overflow: 'hidden',
+    marginBottom: 12,
+  },
+  avatarImg: {
     width: '100%',
+    height: '100%',
   },
-  infoList: {
-    gap: 12,
-    marginBottom: 28,
+  userName: {
+    fontSize: 21,
+    fontWeight: '700',
+    color: COLORS.gray900,
+    textAlign: 'center',
   },
-  infoCard: {
+  userEmail: {
+    fontSize: 13,
+    color: COLORS.gray500,
+    marginTop: 2,
+  },
+  memberSince: {
+    fontSize: 12,
+    color: COLORS.gray400,
+    marginTop: 4,
+  },
+  editProfilePill: {
+    marginTop: 14,
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 14,
-    paddingHorizontal: 16,
-    paddingVertical: 13,
-    borderRadius: 14,
+    gap: 6,
+    backgroundColor: COLORS.teal50,
     borderWidth: 1,
-    borderColor: COLORS.gray200,
-    backgroundColor: COLORS.gray50,
+    borderColor: COLORS.teal100,
+    paddingHorizontal: 20,
+    paddingVertical: 8,
+    borderRadius: 999,
   },
-  infoLabel: {
-    fontSize: 11,
-    color: COLORS.gray400,
+  editProfilePillText: {
+    fontSize: 13,
+    fontWeight: '700',
+    color: COLORS.teal700,
   },
-  infoValue: {
+  statsRow: {
+    backgroundColor: COLORS.white,
+    borderRadius: 18,
+    paddingVertical: 14,
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: COLORS.gray100,
+    marginBottom: 12,
+  },
+  statBox: {
+    flex: 1,
+    alignItems: 'center',
+  },
+  statNumber: {
+    fontSize: 20,
+    fontWeight: '700',
+    color: COLORS.brandTeal,
+  },
+  statLabel: {
+    fontSize: 12,
+    color: COLORS.gray500,
+    marginTop: 2,
+  },
+  statDivider: {
+    width: 1,
+    height: 30,
+    backgroundColor: COLORS.gray100,
+  },
+  contactCard: {
+    backgroundColor: COLORS.white,
+    borderRadius: 16,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderWidth: 1,
+    borderColor: COLORS.gray100,
+    marginBottom: 16,
+  },
+  contactRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+  },
+  contactText: {
     fontSize: 14,
     fontWeight: '600',
-    color: COLORS.gray800,
-    marginTop: 1,
+    color: COLORS.gray700,
   },
-  orangeButton: {
-    backgroundColor: COLORS.orange500,
-    borderRadius: 14,
-    paddingVertical: 15,
+  menuList: {
+    gap: 10,
+  },
+  menuItem: {
+    backgroundColor: COLORS.white,
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+    borderRadius: 18,
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
-    gap: 8,
-    elevation: 2,
+    justifyContent: 'space-between',
+    borderWidth: 1,
+    borderColor: COLORS.gray100,
+    elevation: 1,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.03,
+    shadowRadius: 2,
   },
-  orangeButtonText: {
-    color: COLORS.white,
-    fontSize: 16,
-    fontWeight: '700',
-  },
-  outlineButton: {
-    borderWidth: 2,
-    borderColor: COLORS.brandTeal,
-    borderRadius: 14,
-    paddingVertical: 13,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginTop: 14,
-  },
-  outlineButtonText: {
-    color: COLORS.brandTeal,
-    fontSize: 16,
-    fontWeight: '700',
-  },
-  dividerContainer: {
+  menuItemLeft: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginVertical: 28,
+    gap: 14,
   },
-  dividerLine: {
-    flex: 1,
-    height: 1,
-    backgroundColor: COLORS.gray200,
-  },
-  dividerText: {
-    paddingHorizontal: 14,
-    fontSize: 14,
-    color: COLORS.gray500,
-  },
-  logoutButton: {
-    flexDirection: 'row',
+  menuIconBox: {
+    width: 40,
+    height: 40,
+    borderRadius: 12,
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 8,
-    paddingVertical: 8,
   },
-  logoutText: {
+  menuItemText: {
     fontSize: 14,
     fontWeight: '700',
-    color: COLORS.red500,
+    color: COLORS.gray700,
+  },
+  logoutCard: {
+    marginTop: 8,
+    borderColor: COLORS.red100,
   },
   formContainer: {
+    backgroundColor: COLORS.white,
+    borderRadius: 24,
+    padding: 20,
     gap: 14,
+    borderWidth: 1,
+    borderColor: COLORS.gray100,
+  },
+  subModeHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 4,
+  },
+  backIconBtn: {
+    padding: 4,
   },
   formTitle: {
     fontSize: 18,
     fontWeight: '700',
     color: COLORS.gray800,
-    textAlign: 'center',
-    marginBottom: 4,
   },
   editPhotoSection: {
     alignItems: 'center',
@@ -739,5 +869,33 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: COLORS.red500,
     textAlign: 'center',
+  },
+  orangeButton: {
+    backgroundColor: COLORS.orange500,
+    borderRadius: 14,
+    paddingVertical: 15,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    elevation: 2,
+  },
+  orangeButtonText: {
+    color: COLORS.white,
+    fontSize: 16,
+    fontWeight: '700',
+  },
+  outlineButton: {
+    borderWidth: 2,
+    borderColor: COLORS.brandTeal,
+    borderRadius: 14,
+    paddingVertical: 13,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  outlineButtonText: {
+    color: COLORS.brandTeal,
+    fontSize: 16,
+    fontWeight: '700',
   },
 });

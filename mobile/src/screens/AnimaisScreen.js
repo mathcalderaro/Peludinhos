@@ -28,6 +28,8 @@ export default function AnimaisScreen({ navigation }) {
   const { animais, removerAnimal } = usePets();
   const [busca, setBusca] = useState('');
   const [categoriaAtiva, setCategoriaAtiva] = useState('Todos');
+  const [filtroSaude, setFiltroSaude] = useState('Todos');
+  const [modalFiltroVisivel, setModalFiltroVisivel] = useState(false);
   const [animalOpcoes, setAnimalOpcoes] = useState(null);
 
   function confirmarExclusao(animal) {
@@ -54,6 +56,12 @@ export default function AnimaisScreen({ navigation }) {
         (categoriaAtiva === 'Gatos' && item.especie === 'Gato') ||
         (categoriaAtiva === 'Chipados' && item.chipado);
 
+      const matchSaude =
+        filtroSaude === 'Todos' ||
+        (filtroSaude === 'Castrado' && item.castrado) ||
+        (filtroSaude === 'Vacinado' && item.vacinado) ||
+        (filtroSaude === 'Chipado' && item.chipado);
+
       const termo = busca.trim().toLowerCase();
       const matchBusca =
         !termo ||
@@ -61,9 +69,9 @@ export default function AnimaisScreen({ navigation }) {
         item.local.toLowerCase().includes(termo) ||
         item.raca.toLowerCase().includes(termo);
 
-      return matchCategoria && matchBusca;
+      return matchCategoria && matchSaude && matchBusca;
     });
-  }, [animais, busca, categoriaAtiva]);
+  }, [animais, busca, categoriaAtiva, filtroSaude]);
 
   function renderAnimalCard({ item }) {
     return (
@@ -97,8 +105,8 @@ export default function AnimaisScreen({ navigation }) {
                 <Text style={styles.tagTealText}>Castrado</Text>
               </View>
             ) : (
-              <View style={styles.tagOrange}>
-                <Text style={styles.tagOrangeText}>Não castrado</Text>
+              <View style={styles.tagTeal}>
+                <Text style={styles.tagTealText}>Não castrado</Text>
               </View>
             )}
 
@@ -129,11 +137,7 @@ export default function AnimaisScreen({ navigation }) {
         searchValue={busca}
         onSearchChange={setBusca}
         showMenuButton={false}
-        onFilterPress={() => {
-          const idxAtual = CATEGORIAS.findIndex((c) => c.key === categoriaAtiva);
-          const proxIndex = (idxAtual + 1) % CATEGORIAS.length;
-          setCategoriaAtiva(CATEGORIAS[proxIndex].key);
-        }}
+        onFilterPress={() => setModalFiltroVisivel(true)}
       />
 
       <View style={styles.content}>
@@ -260,6 +264,80 @@ export default function AnimaisScreen({ navigation }) {
             </TouchableOpacity>
           </View>
         </TouchableOpacity>
+      </Modal>
+
+      {/* Modal de Filtros */}
+      <Modal
+        visible={modalFiltroVisivel}
+        transparent
+        animationType="slide"
+        onRequestClose={() => setModalFiltroVisivel(false)}
+      >
+        <View style={styles.filterModalBackdrop}>
+          <View style={styles.filterModalCard}>
+            <View style={styles.filterModalHeader}>
+              <Text style={styles.optionsTitle}>Filtrar Animais</Text>
+              <TouchableOpacity onPress={() => setModalFiltroVisivel(false)}>
+                <Ionicons name="close" size={24} color={COLORS.gray500} />
+              </TouchableOpacity>
+            </View>
+
+            <Text style={styles.filterGroupLabel}>Espécie</Text>
+            <View style={styles.filterChipsWrap}>
+              {['Todos', 'Cachorros', 'Gatos'].map((cat) => {
+                const ativo = categoriaAtiva === cat;
+                return (
+                  <TouchableOpacity
+                    key={cat}
+                    style={[styles.filterChip, ativo && styles.filterChipActive]}
+                    onPress={() => setCategoriaAtiva(cat)}
+                  >
+                    <Text style={[styles.filterChipText, ativo && styles.filterChipTextActive]}>
+                      {cat}
+                    </Text>
+                  </TouchableOpacity>
+                );
+              })}
+            </View>
+
+            <Text style={styles.filterGroupLabel}>Saúde</Text>
+            <View style={styles.filterChipsWrap}>
+              {['Todos', 'Castrado', 'Vacinado', 'Chipado'].map((saude) => {
+                const ativo = filtroSaude === saude;
+                return (
+                  <TouchableOpacity
+                    key={saude}
+                    style={[styles.filterChip, ativo && styles.filterChipActive]}
+                    onPress={() => setFiltroSaude(saude)}
+                  >
+                    <Text style={[styles.filterChipText, ativo && styles.filterChipTextActive]}>
+                      {saude}
+                    </Text>
+                  </TouchableOpacity>
+                );
+              })}
+            </View>
+
+            <View style={styles.filterModalActions}>
+              <TouchableOpacity
+                style={styles.filterClearBtn}
+                onPress={() => {
+                  setCategoriaAtiva('Todos');
+                  setFiltroSaude('Todos');
+                  setModalFiltroVisivel(false);
+                }}
+              >
+                <Text style={styles.filterClearText}>Limpar</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.filterApplyBtn}
+                onPress={() => setModalFiltroVisivel(false)}
+              >
+                <Text style={styles.filterApplyText}>Aplicar Filtros</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
       </Modal>
     </SafeAreaView>
   );
@@ -463,5 +541,85 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: '600',
     color: COLORS.gray700,
+  },
+  filterModalBackdrop: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.45)',
+    justifyContent: 'flex-end',
+  },
+  filterModalCard: {
+    backgroundColor: COLORS.white,
+    borderTopLeftRadius: 28,
+    borderTopRightRadius: 28,
+    padding: 22,
+  },
+  filterModalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  filterGroupLabel: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: COLORS.gray800,
+    marginBottom: 10,
+    marginTop: 6,
+  },
+  filterChipsWrap: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+    marginBottom: 12,
+  },
+  filterChip: {
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    borderRadius: 999,
+    borderWidth: 1,
+    borderColor: COLORS.gray200,
+    backgroundColor: COLORS.gray50,
+  },
+  filterChipActive: {
+    backgroundColor: COLORS.brandTeal,
+    borderColor: COLORS.brandTeal,
+  },
+  filterChipText: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: COLORS.gray600,
+  },
+  filterChipTextActive: {
+    color: COLORS.white,
+  },
+  filterModalActions: {
+    flexDirection: 'row',
+    gap: 12,
+    marginTop: 14,
+  },
+  filterClearBtn: {
+    flex: 1,
+    paddingVertical: 14,
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: COLORS.gray200,
+    alignItems: 'center',
+  },
+  filterClearText: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: COLORS.gray600,
+  },
+  filterApplyBtn: {
+    flex: 2,
+    paddingVertical: 14,
+    borderRadius: 14,
+    backgroundColor: COLORS.brandTeal,
+    alignItems: 'center',
+  },
+  filterApplyText: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: COLORS.white,
   },
 });

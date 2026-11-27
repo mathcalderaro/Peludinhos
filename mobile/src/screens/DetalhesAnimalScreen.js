@@ -37,6 +37,10 @@ export default function DetalhesAnimalScreen({ route, navigation }) {
     descricao: '',
   };
 
+  const fotos = Array.isArray(animal.fotos) && animal.fotos.length > 0
+    ? animal.fotos
+    : [animal.foto];
+
   async function compartilharAnimal() {
     try {
       await Share.share({
@@ -57,16 +61,20 @@ export default function DetalhesAnimalScreen({ route, navigation }) {
       />
 
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
-        {/* Imagem Principal + Dots + Badge Chipado */}
+        {/* Imagem Principal + Dots (só se houver mais de 1 foto) + Badge Chipado */}
         <View style={styles.imageContainer}>
-          <Image source={{ uri: animal.foto }} style={styles.heroImage} />
+          <Image source={{ uri: fotos[0] }} style={styles.heroImage} />
 
-          <View style={styles.photoDotsRow}>
-            <View style={[styles.photoDot, styles.photoDotActive]} />
-            <View style={styles.photoDot} />
-            <View style={styles.photoDot} />
-            <View style={styles.photoDot} />
-          </View>
+          {fotos.length > 1 ? (
+            <View style={styles.photoDotsRow}>
+              {fotos.map((_, idx) => (
+                <View
+                  key={idx}
+                  style={[styles.photoDot, idx === 0 && styles.photoDotActive]}
+                />
+              ))}
+            </View>
+          ) : null}
 
           {animal.chipado ? (
             <View style={styles.chipadoFloatingBadge}>
@@ -173,11 +181,9 @@ export default function DetalhesAnimalScreen({ route, navigation }) {
                   <Text style={styles.healthBadgeText}>Castrado</Text>
                 </View>
               ) : (
-                <View style={[styles.healthBadge, styles.healthBadgeWarning]}>
-                  <Ionicons name="alert-circle" size={16} color={COLORS.orange500} />
-                  <Text style={[styles.healthBadgeText, { color: COLORS.orange600 }]}>
-                    Não castrado
-                  </Text>
+                <View style={styles.healthBadge}>
+                  <Ionicons name="information-circle" size={16} color={COLORS.teal700} />
+                  <Text style={styles.healthBadgeText}>Não castrado</Text>
                 </View>
               )}
 

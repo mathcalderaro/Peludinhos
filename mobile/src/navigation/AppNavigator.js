@@ -122,9 +122,9 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.white,
     borderTopWidth: 1,
     borderTopColor: COLORS.gray100,
-    height: 64,
-    paddingBottom: 8,
-    paddingTop: 6,
+    height: 74,
+    paddingBottom: 12,
+    paddingTop: 8,
     elevation: 10,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: -4 },
@@ -132,7 +132,7 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
   },
   tabLabel: {
-    fontSize: 10,
+    fontSize: 11,
     fontWeight: '600',
   },
 });

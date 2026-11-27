@@ -22,6 +22,8 @@ import { usePets } from '../context/PetsContext';
 export default function PerdidosScreen() {
   const { perdidos, adicionarPerdido } = usePets();
   const [busca, setBusca] = useState('');
+  const [filtroEspecie, setFiltroEspecie] = useState('Todos');
+  const [modalFiltroVisivel, setModalFiltroVisivel] = useState(false);
   const [animalSelecionado, setAnimalSelecionado] = useState(null);
 
   const [modalVisivel, setModalVisivel] = useState(false);
@@ -34,14 +36,17 @@ export default function PerdidosScreen() {
 
   const perdidosFiltrados = useMemo(() => {
     const termo = busca.trim().toLowerCase();
-    if (!termo) return perdidos;
-    return perdidos.filter(
-      (p) =>
+    return perdidos.filter((p) => {
+      const matchEspecie =
+        filtroEspecie === 'Todos' || p.especie === filtroEspecie;
+      const matchBusca =
+        !termo ||
         p.nome.toLowerCase().includes(termo) ||
         p.vistoEm.toLowerCase().includes(termo) ||
-        p.descricao.toLowerCase().includes(termo)
-    );
-  }, [perdidos, busca]);
+        p.descricao.toLowerCase().includes(termo);
+      return matchEspecie && matchBusca;
+    });
+  }, [perdidos, busca, filtroEspecie]);
 
   async function compartilhar(item) {
     try {
@@ -150,7 +155,8 @@ export default function PerdidosScreen() {
       <MainHeader
         searchValue={busca}
         onSearchChange={setBusca}
-        showMenuButton={true}
+        showMenuButton={false}
+        onFilterPress={() => setModalFiltroVisivel(true)}
       />
 
       <FlatList
@@ -326,6 +332,59 @@ export default function PerdidosScreen() {
 
             <TouchableOpacity style={styles.submitBtn} onPress={handleSalvarFuga}>
               <Text style={styles.submitBtnText}>Publicar Alerta</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+      {/* Modal de Filtro de Perdidos */}
+      <Modal
+        visible={modalFiltroVisivel}
+        transparent
+        animationType="slide"
+        onRequestClose={() => setModalFiltroVisivel(false)}
+      >
+        <View style={styles.modalBackdrop}>
+          <View style={styles.modalCard}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>Filtrar Perdidos</Text>
+              <TouchableOpacity onPress={() => setModalFiltroVisivel(false)}>
+                <Ionicons name="close" size={24} color={COLORS.gray500} />
+              </TouchableOpacity>
+            </View>
+
+            <Text style={{ fontSize: 14, fontWeight: '700', color: COLORS.gray800 }}>
+              Espécie
+            </Text>
+            <View style={styles.speciesToggle}>
+              {['Todos', 'Cachorro', 'Gato'].map((esp) => {
+                const ativo = filtroEspecie === esp;
+                return (
+                  <TouchableOpacity
+                    key={esp}
+                    style={[
+                      styles.speciesBtn,
+                      ativo && { backgroundColor: COLORS.brandTeal },
+                    ]}
+                    onPress={() => setFiltroEspecie(esp)}
+                  >
+                    <Text
+                      style={[
+                        styles.speciesBtnText,
+                        ativo && styles.speciesBtnTextActive,
+                      ]}
+                    >
+                      {esp}
+                    </Text>
+                  </TouchableOpacity>
+                );
+              })}
+            </View>
+
+            <TouchableOpacity
+              style={[styles.submitBtn, { backgroundColor: COLORS.brandTeal }]}
+              onPress={() => setModalFiltroVisivel(false)}
+            >
+              <Text style={styles.submitBtnText}>Aplicar Filtro</Text>
             </TouchableOpacity>
           </View>
         </View>

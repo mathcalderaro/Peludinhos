@@ -1,12 +1,12 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import {
   View,
   Text,
   Image,
   TouchableOpacity,
-  FlatList,
   StyleSheet,
   Dimensions,
+  Animated,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { COLORS } from '../theme/colors';
@@ -36,19 +36,19 @@ const SLIDES = [
 ];
 
 export default function OnboardingScreen({ onFinish }) {
-  const flatListRef = useRef(null);
+  const scrollX = useRef(new Animated.Value(0)).current;
+  const buttonAnim = useRef(new Animated.Value(0)).current;
   const [indiceAtual, setIndiceAtual] = useState(0);
 
-  function avancar() {
-    if (indiceAtual < SLIDES.length - 1) {
-      flatListRef.current?.scrollToIndex({
-        index: indiceAtual + 1,
-        animated: true,
-      });
-    } else {
-      onFinish();
-    }
-  }
+  const isLastSlide = indiceAtual === SLIDES.length - 1;
+
+  useEffect(() => {
+    Animated.timing(buttonAnim, {
+      toValue: isLastSlide ? 1 : 0,
+      duration: 320,
+      useNativeDriver: true,
+    }).start();
+  }, [isLastSlide, buttonAnim]);
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -66,47 +66,116 @@ export default function OnboardingScreen({ onFinish }) {
         <PataFilterIcon size={40} color="#CBE5E5" />
       </View>
 
-      <TouchableOpacity style={styles.skipBtn} onPress={onFinish}>
-        <Text style={styles.skipText}>Pular</Text>
-      </TouchableOpacity>
-
-      <FlatList
-        ref={flatListRef}
+      <Animated.FlatList
         data={SLIDES}
         keyExtractor={(item) => item.key}
         horizontal
         pagingEnabled
+        decelerationRate="fast"
         showsHorizontalScrollIndicator={false}
+        scrollEventThrottle={16}
+        onScroll={Animated.event(
+          [{ nativeEvent: { contentOffset: { x: scrollX } } }],
+          { useNativeDriver: true }
+        )}
         onMomentumScrollEnd={(event) => {
           const index = Math.round(event.nativeEvent.contentOffset.x / SCREEN_WIDTH);
           setIndiceAtual(index);
         }}
-        renderItem={({ item }) => (
-          <View style={styles.slide}>
-            <Image source={item.image} style={styles.illustration} resizeMode="contain" />
-            <Text style={styles.title}>{item.title}</Text>
-            <Text style={styles.subtitle}>{item.subtitle}</Text>
-          </View>
-        )}
+        renderItem={({ item, index }) => {
+          const inputRange = [
+            (index - 1) * SCREEN_WIDTH,
+            index * SCREEN_WIDTH,
+            (index + 1) * SCREEN_WIDTH,
+          ];
+
+          const opacity = scrollX.interpolate({
+            inputRange,
+            outputRange: [0.35, 1, 0.35],
+            extrapolate: 'clamp',
+          });
+
+          const scale = scrollX.interpolate({
+            inputRange,
+            outputRange: [0.9, 1, 0.9],
+            extrapolate: 'clamp',
+          });
+
+          const translateY = scrollX.interpolate({
+            inputRange,
+            outputRange: [18, 0, 18],
+            extrapolate: 'clamp',
+          });
+
+          return (
+            <Animated.View
+              style={[
+                styles.slide,
+                { opacity, transform: [{ scale }, { translateY }] },
+              ]}
+            >
+              <Image source={item.image} style={styles.illustration} resizeMode="contain" />
+              <Text style={styles.title}>{item.title}</Text>
+              <Text style={styles.subtitle}>{item.subtitle}</Text>
+            </Animated.View>
+          );
+        }}
       />
 
       <View style={styles.footer}>
-        <TouchableOpacity style={styles.nextButton} onPress={avancar} activeOpacity={0.85}>
-          <Text style={styles.nextButtonText}>
-            {indiceAtual === SLIDES.length - 1 ? 'Começar' : 'Próximo'}
-          </Text>
-        </TouchableOpacity>
+        {/* Botão aparece suavemente apenas na última tela */}
+        <Animated.View
+          pointerEvents={isLastSlide ? 'auto' : 'none'}
+          style={{
+            width: '100%',
+            opacity: buttonAnim,
+            transform: [
+              {
+                translateY: buttonAnim.interpolate({
+                  inputRange: [0, 1],
+                  outputRange: [14, 0],
+                }),
+              },
+            ],
+          }}
+        >
+          <TouchableOpacity style={styles.nextButton} onPress={onFinish} activeOpacity={0.85}>
+            <Text style={styles.nextButtonText}>Começar</Text>
+          </TouchableOpacity>
+        </Animated.View>
 
         <View style={styles.dotsRow}>
-          {SLIDES.map((_, idx) => (
-            <View
-              key={idx}
-              style={[
-                styles.dot,
-                idx === indiceAtual ? styles.dotActive : styles.dotInactive,
-              ]}
-            />
-          ))}
+          {SLIDES.map((_, idx) => {
+            const inputRange = [
+              (idx - 1) * SCREEN_WIDTH,
+              idx * SCREEN_WIDTH,
+              (idx + 1) * SCREEN_WIDTH,
+            ];
+            const dotScale = scrollX.interpolate({
+              inputRange,
+              outputRange: [1, 1.25, 1],
+              extrapolate: 'clamp',
+            });
+            const dotOpacity = scrollX.interpolate({
+              inputRange,
+              outputRange: [0.4, 1, 0.4],
+              extrapolate: 'clamp',
+            });
+
+            return (
+              <Animated.View
+                key={idx}
+                style={[
+                  styles.dot,
+                  {
+                    backgroundColor: COLORS.orange500,
+                    opacity: dotOpacity,
+                    transform: [{ scale: dotScale }],
+                  },
+                ]}
+              />
+            );
+          })}
         </View>
       </View>
     </SafeAreaView>
@@ -146,18 +215,6 @@ const styles = StyleSheet.create({
     right: 52,
     transform: [{ rotate: '-10deg' }],
     opacity: 0.65,
-  },
-  skipBtn: {
-    alignSelf: 'flex-end',
-    paddingHorizontal: 20,
-    paddingTop: 12,
-    paddingBottom: 4,
-    zIndex: 10,
-  },
-  skipText: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: COLORS.brandTeal,
   },
   slide: {
     width: SCREEN_WIDTH,
@@ -217,11 +274,5 @@ const styles = StyleSheet.create({
     width: 11,
     height: 11,
     borderRadius: 6,
-  },
-  dotActive: {
-    backgroundColor: COLORS.orange500,
-  },
-  dotInactive: {
-    backgroundColor: '#FCD9B6',
   },
 });

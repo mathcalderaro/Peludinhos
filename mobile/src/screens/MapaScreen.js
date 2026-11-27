@@ -7,6 +7,7 @@ import {
   ScrollView,
   StyleSheet,
   Platform,
+  Modal,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { WebView } from 'react-native-webview';
@@ -20,17 +21,32 @@ const PELUDINHOS_PIN_SVG = `<svg width="26" height="36" viewBox="0 0 190 284" fi
 export default function MapaScreen({ navigation }) {
   const { animais } = usePets();
   const [busca, setBusca] = useState('');
+  const [filtroEspecie, setFiltroEspecie] = useState('Todos');
+  const [filtroSaude, setFiltroSaude] = useState('Todos');
+  const [modalFiltroVisivel, setModalFiltroVisivel] = useState(false);
 
   const animaisFiltrados = useMemo(() => {
     const termo = busca.trim().toLowerCase();
-    if (!termo) return animais;
-    return animais.filter(
-      (a) =>
+    return animais.filter((a) => {
+      const matchEspecie =
+        filtroEspecie === 'Todos' ||
+        (filtroEspecie === 'Cachorros' && a.especie === 'Cachorro') ||
+        (filtroEspecie === 'Gatos' && a.especie === 'Gato');
+
+      const matchSaude =
+        filtroSaude === 'Todos' ||
+        (filtroSaude === 'Castrado' && a.castrado) ||
+        (filtroSaude === 'Chipado' && a.chipado);
+
+      const matchBusca =
+        !termo ||
         a.nome.toLowerCase().includes(termo) ||
         a.local.toLowerCase().includes(termo) ||
-        a.especie.toLowerCase().includes(termo)
-    );
-  }, [animais, busca]);
+        a.especie.toLowerCase().includes(termo);
+
+      return matchEspecie && matchSaude && matchBusca;
+    });
+  }, [animais, busca, filtroEspecie, filtroSaude]);
 
   const leafletHtml = useMemo(() => {
     const markersJson = JSON.stringify(animaisFiltrados);
@@ -113,7 +129,8 @@ export default function MapaScreen({ navigation }) {
       <MainHeader
         searchValue={busca}
         onSearchChange={setBusca}
-        showMenuButton={true}
+        showMenuButton={false}
+        onFilterPress={() => setModalFiltroVisivel(true)}
       />
 
       <View style={styles.mapWrapper}>
@@ -169,18 +186,8 @@ export default function MapaScreen({ navigation }) {
                     <Text style={styles.sightingMeta}>
                       {item.tempo} • {item.local}
                     </Text>
-                    <View
-                      style={[
-                        styles.sightingBadge,
-                        item.castrado ? styles.badgeTeal : styles.badgeOrange,
-                      ]}
-                    >
-                      <Text
-                        style={[
-                          styles.sightingBadgeText,
-                          item.castrado ? styles.badgeTealText : styles.badgeOrangeText,
-                        ]}
-                      >
+                    <View style={[styles.sightingBadge, styles.badgeTeal]}>
+                      <Text style={[styles.sightingBadgeText, styles.badgeTealText]}>
                         {item.castrado ? 'Castrado' : 'Não castrado'}
                       </Text>
                     </View>
@@ -192,6 +199,80 @@ export default function MapaScreen({ navigation }) {
           </ScrollView>
         </View>
       </View>
+
+      {/* Modal de Filtros do Mapa */}
+      <Modal
+        visible={modalFiltroVisivel}
+        transparent
+        animationType="slide"
+        onRequestClose={() => setModalFiltroVisivel(false)}
+      >
+        <View style={styles.filterModalBackdrop}>
+          <View style={styles.filterModalCard}>
+            <View style={styles.filterModalHeader}>
+              <Text style={styles.filterModalTitle}>Filtrar Mapa</Text>
+              <TouchableOpacity onPress={() => setModalFiltroVisivel(false)}>
+                <Ionicons name="close" size={24} color={COLORS.gray500} />
+              </TouchableOpacity>
+            </View>
+
+            <Text style={styles.filterGroupLabel}>Espécie</Text>
+            <View style={styles.filterChipsWrap}>
+              {['Todos', 'Cachorros', 'Gatos'].map((esp) => {
+                const ativo = filtroEspecie === esp;
+                return (
+                  <TouchableOpacity
+                    key={esp}
+                    style={[styles.filterChip, ativo && styles.filterChipActive]}
+                    onPress={() => setFiltroEspecie(esp)}
+                  >
+                    <Text style={[styles.filterChipText, ativo && styles.filterChipTextActive]}>
+                      {esp}
+                    </Text>
+                  </TouchableOpacity>
+                );
+              })}
+            </View>
+
+            <Text style={styles.filterGroupLabel}>Saúde</Text>
+            <View style={styles.filterChipsWrap}>
+              {['Todos', 'Castrado', 'Chipado'].map((saude) => {
+                const ativo = filtroSaude === saude;
+                return (
+                  <TouchableOpacity
+                    key={saude}
+                    style={[styles.filterChip, ativo && styles.filterChipActive]}
+                    onPress={() => setFiltroSaude(saude)}
+                  >
+                    <Text style={[styles.filterChipText, ativo && styles.filterChipTextActive]}>
+                      {saude}
+                    </Text>
+                  </TouchableOpacity>
+                );
+              })}
+            </View>
+
+            <View style={styles.filterModalActions}>
+              <TouchableOpacity
+                style={styles.filterClearBtn}
+                onPress={() => {
+                  setFiltroEspecie('Todos');
+                  setFiltroSaude('Todos');
+                  setModalFiltroVisivel(false);
+                }}
+              >
+                <Text style={styles.filterClearText}>Limpar</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.filterApplyBtn}
+                onPress={() => setModalFiltroVisivel(false)}
+              >
+                <Text style={styles.filterApplyText}>Aplicar</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 }
@@ -241,7 +322,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     height: 228,
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.surface,
     borderTopLeftRadius: 26,
     borderTopRightRadius: 26,
     paddingTop: 18,
@@ -263,7 +344,7 @@ const styles = StyleSheet.create({
   sheetTitle: {
     fontSize: 17,
     fontWeight: '700',
-    color: COLORS.gray800,
+    color: COLORS.brandTeal,
   },
   seeAllText: {
     fontSize: 14,
@@ -328,5 +409,90 @@ const styles = StyleSheet.create({
   sightingBadgeText: {
     fontSize: 10,
     fontWeight: '600',
+  },
+  filterModalBackdrop: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.45)',
+    justifyContent: 'flex-end',
+  },
+  filterModalCard: {
+    backgroundColor: COLORS.white,
+    borderTopLeftRadius: 28,
+    borderTopRightRadius: 28,
+    padding: 22,
+  },
+  filterModalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  filterModalTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: COLORS.gray800,
+  },
+  filterGroupLabel: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: COLORS.gray800,
+    marginBottom: 10,
+    marginTop: 6,
+  },
+  filterChipsWrap: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+    marginBottom: 12,
+  },
+  filterChip: {
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    borderRadius: 999,
+    borderWidth: 1,
+    borderColor: COLORS.gray200,
+    backgroundColor: COLORS.gray50,
+  },
+  filterChipActive: {
+    backgroundColor: COLORS.brandTeal,
+    borderColor: COLORS.brandTeal,
+  },
+  filterChipText: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: COLORS.gray600,
+  },
+  filterChipTextActive: {
+    color: COLORS.white,
+  },
+  filterModalActions: {
+    flexDirection: 'row',
+    gap: 12,
+    marginTop: 14,
+  },
+  filterClearBtn: {
+    flex: 1,
+    paddingVertical: 14,
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: COLORS.gray200,
+    alignItems: 'center',
+  },
+  filterClearText: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: COLORS.gray600,
+  },
+  filterApplyBtn: {
+    flex: 2,
+    paddingVertical: 14,
+    borderRadius: 14,
+    backgroundColor: COLORS.brandTeal,
+    alignItems: 'center',
+  },
+  filterApplyText: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: COLORS.white,
   },
 });
