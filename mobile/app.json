@@ -1,0 +1,40 @@
+{
+  "expo": {
+    "name": "Peludinhos",
+    "slug": "peludinhos",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/favicon.png",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "image": "./assets/logo.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#f9f9ff"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "infoPlist": {
+        "NSPhotoLibraryUsageDescription": "O aplicativo precisa acessar suas fotos para enviar a imagem do animal ou do seu perfil.",
+        "NSCameraUsageDescription": "O aplicativo precisa acessar sua câmera para fotografar animais avistados.",
+        "NSLocationWhenInUseUsageDescription": "O aplicativo precisa da sua localização para marcar onde o animal foi avistado."
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/favicon.png",
+        "backgroundColor": "#1a8d8d"
+      },
+      "permissions": [
+        "READ_EXTERNAL_STORAGE",
+        "WRITE_EXTERNAL_STORAGE",
+        "CAMERA",
+        "ACCESS_FINE_LOCATION",
+        "ACCESS_COARSE_LOCATION"
+      ]
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    }
+  }
+}
+
